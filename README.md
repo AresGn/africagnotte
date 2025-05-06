@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AfricaGnotte
 
-## Getting Started
+AfricaGnotte est une plateforme de collecte de dons 100% dédiée à l'Afrique, centrée sur l'aide aux personnes en difficulté (malades, familles sans abri, orphelins, etc.).
 
-First, run the development server:
+## Caractéristiques
+
+- Création rapide de cagnottes pour différentes catégories (Santé, Famille, Orphelins, Urgences)
+- Interface responsive optimisée pour mobile, tablette et ordinateur
+- Système de paiement sécurisé adapté à l'Afrique (Mobile Money, cartes bancaires, etc.)
+- Partage facile sur réseaux sociaux et WhatsApp
+- Support pour les photos et vidéos
+- Système de modération pour garantir l'authenticité des besoins
+
+## Technologies utilisées
+
+- **Frontend:** Next.js 15.3, React 19
+- **Styling:** Tailwind CSS 4
+- **Deployment:** À définir
+
+## Installation
 
 ```bash
+# Cloner le répertoire
+git clone <repository-url>
+
+# Installer les dépendances
+cd africagnotte
+npm install
+
+# Lancer le serveur de développement
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Structure du projet
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+africagnotte/
+├── app/              # Dossier principal de l'application Next.js
+│   ├── components/   # Composants React réutilisables
+│   ├── globals.css   # Styles globaux
+│   ├── layout.tsx    # Layout principal
+│   └── page.tsx      # Page d'accueil
+├── public/           # Fichiers statiques (images, etc.)
+├── README.md         # Ce fichier
+├── package.json      # Dépendances du projet
+└── tailwind.config.js # Configuration Tailwind CSS
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Prochaines étapes
 
-## Learn More
+- Mise en place de l'authentification
+- Intégration des passerelles de paiement africaines
+- Système de modération des cagnottes
+- Tableaux de bord utilisateurs et administrateurs
+- Support multilingue
 
-To learn more about Next.js, take a look at the following resources:
+## Licence
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[À définir]
