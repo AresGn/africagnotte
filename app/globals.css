@@ -1,0 +1,58 @@
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+:root {
+  /* African-inspired color palette */
+  --primary-color: #E57A44; /* Warm orange/terracotta */
+  --secondary-color: #5FA777; /* Green representing nature and growth */
+  --accent-color: #EFCB68; /* Gold/yellow representing wealth and hope */
+  --dark-color: #472D2D; /* Earth brown */
+  --light-color: #FAF3E0; /* Sand/cream color */
+  --error-color: #B81D13; /* Deep red */
+  --success-color: #2E8B57; /* Forest green */
+}
+
+body {
+  color: var(--dark-color);
+  background-color: var(--light-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+.btn-primary {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  color: white;
+  transition-property: all;
+  background-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  background-color: #d86a34;
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  color: white;
+  transition-property: all;
+  background-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  background-color: #4f9667;
+}
+
+.container-custom {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+} 
