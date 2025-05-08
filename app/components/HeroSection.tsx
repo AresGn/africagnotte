@@ -19,11 +19,8 @@ export default function HeroSection() {
             centrée sur l&apos;aide aux personnes en difficulté.
           </p>
           <div className="flex space-x-4">
-            <Link href="/creer" className="btn-primary">
+            <Link href="/creer" className="btn-primary text-xl py-4 px-8 font-bold">
               Créer une cagnotte
-            </Link>
-            <Link href="/cagnottes" className="btn-secondary">
-              Découvrir les projets
             </Link>
           </div>
         </div>
