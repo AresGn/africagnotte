@@ -7,6 +7,10 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
   },
+  reactStrictMode: true,
+  webpack: (config) => {
+    return config;
+  },
 };
 
 module.exports = nextConfig; 

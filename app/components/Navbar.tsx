@@ -7,7 +7,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="py-4 bg-white shadow-md">
+    <nav className="py-4 bg-white shadow-md fixed top-0 left-0 right-0 z-50">
       <div className="container-custom flex items-center justify-between">
         {/* Logo with Link to Home */}
         <div className="flex items-center">
@@ -58,7 +58,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden px-4 pt-4 pb-6 bg-white shadow-lg fixed top-14 left-0 right-0 z-50">
+        <div className="md:hidden px-4 pt-4 pb-6 bg-white shadow-lg fixed top-16 left-0 right-0 z-50">
           <div className="flex flex-col space-y-3">
             <Link 
               href="/recherche" 

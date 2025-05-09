@@ -2,18 +2,11 @@ import Link from 'next/link';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CampaignCard from './components/CampaignCard';
-import CategoryCard from './components/CategoryCard';
-import Testimonial from './components/Testimonial';
 import HeroSection from './components/HeroSection';
+import { AnimatedTestimonialsDemo } from './components/ui/animated-testimonials-demo';
+import { CategoryTabsDemo } from './components/ui/category-tabs-demo';
 
 // Sample data - in a real app, this would come from an API/database
-const categories = [
-  { name: 'Santé', emoji: '🏥' },
-  { name: 'Famille', emoji: '👪' },
-  { name: 'Orphelins', emoji: '👶' },
-  { name: 'Urgences', emoji: '🚨' }
-];
-
 const campaigns = [
   {
     id: 1,
@@ -44,26 +37,9 @@ const campaigns = [
   }
 ];
 
-const testimonials = [
-  {
-    id: 1,
-    imageUrl: '/images/testimonial-1.jpg',
-    name: 'Amina K.',
-    role: "Bénéficiaire d'une cagnotte médicale",
-    quote: "Grâce à AfricaGnotte, j'ai pu financer l'opération dont j'avais besoin. Je suis infiniment reconnaissante envers tous les donateurs qui m'ont soutenue."
-  },
-  {
-    id: 2,
-    imageUrl: '/images/testimonial-2.jpg',
-    name: 'Ibrahim M.',
-    role: 'Père de famille aidé après une inondation',
-    quote: 'Après avoir perdu notre maison dans une inondation, AfricaGnotte a permis à ma famille de se reloger et de reprendre espoir. Merci du fond du cœur.'
-  }
-];
-
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen pt-16">
       <Navbar />
 
       {/* Hero Section */}
@@ -75,15 +51,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-10 text-center" style={{ color: 'var(--dark-color)' }}>
             Catégories de cagnottes
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category) => (
-              <CategoryCard 
-                key={category.name}
-                name={category.name}
-                emoji={category.emoji}
-              />
-            ))}
-          </div>
+          <CategoryTabsDemo />
         </div>
       </section>
 
@@ -152,18 +120,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-10 text-center">
             Ils ont été aidés
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {testimonials.map((testimonial) => (
-              <Testimonial
-                key={testimonial.id}
-                id={testimonial.id}
-                imageUrl={testimonial.imageUrl}
-                name={testimonial.name}
-                role={testimonial.role}
-                quote={testimonial.quote}
-              />
-            ))}
-          </div>
+          <AnimatedTestimonialsDemo />
         </div>
       </section>
 
