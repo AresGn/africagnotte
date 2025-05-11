@@ -15,7 +15,7 @@ const CategoryTabs = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">
           <div className="relative w-full h-60">
             <Image
-              src="https://images.unsplash.com/photo-1531685250784-7569952593d2?q=80&w=2274&auto=format&fit=crop&ixlib=rb-4.0.3"
+              src="/images/Urgence.jpg"
               alt="Urgence"
               className="rounded-lg object-cover shadow-lg"
               fill
@@ -52,7 +52,7 @@ const CategoryTabs = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">
           <div className="relative w-full h-60">
             <Image
-              src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
+              src="/images/Santé.jpg"
               alt="Santé"
               className="rounded-lg object-cover shadow-lg"
               fill
@@ -89,7 +89,7 @@ const CategoryTabs = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">
           <div className="relative w-full h-60">
             <Image
-              src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2122&auto=format&fit=crop&ixlib=rb-4.0.3"
+              src="/images/Éducation.jpg"
               alt="Éducation"
               className="rounded-lg object-cover shadow-lg"
               fill
@@ -126,7 +126,7 @@ const CategoryTabs = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">
           <div className="relative w-full h-60">
             <Image
-              src="https://images.unsplash.com/photo-1603344204980-4edb0ea63dc8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
+              src="/images/Familles.jpg"
               alt="Familles"
               className="rounded-lg object-cover shadow-lg"
               fill
