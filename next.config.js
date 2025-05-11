@@ -8,7 +8,10 @@ const nextConfig = {
     scrollRestoration: true,
   },
   reactStrictMode: true,
-  webpack: (config) => {
+  webpack: (config, { isServer, dev }) => {
+    if (dev && !isServer) {
+      config.devtool = 'eval-source-map';
+    }
     return config;
   },
 };

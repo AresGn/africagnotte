@@ -1,0 +1,19 @@
+/* Désactiver complètement l'overlay d'erreur de développement Next.js */
+.nextjs-portal {
+  display: none !important;
+}
+
+/* Alternative: minimiser l'overlay au lieu de le cacher complètement */
+/*
+[data-nextjs-dialog] {
+  max-width: 50% !important;
+  max-height: 50% !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
+  top: auto !important;
+  opacity: 0.8 !important;
+  transform: scale(0.5) !important;
+  transform-origin: bottom right !important;
+}
+*/ 
