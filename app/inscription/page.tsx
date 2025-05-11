@@ -1,11 +1,12 @@
 'use client';
 
-import AuthForm from '../../components/AuthForm';
+import RegisterForm from '../../components/RegisterForm';
+import AuthLayout from '../../components/AuthLayout';
 
 export default function InscriptionPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <AuthForm />
-    </div>
+    <AuthLayout title="Créer un compte">
+      <RegisterForm />
+    </AuthLayout>
   );
 } 

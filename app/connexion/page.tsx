@@ -1,11 +1,12 @@
 'use client';
 
-import AuthForm from '../../components/AuthForm';
+import LoginForm from '../../components/LoginForm';
+import AuthLayout from '../../components/AuthLayout';
 
 export default function ConnexionPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <AuthForm />
-    </div>
+    <AuthLayout title="Connexion à votre compte">
+      <LoginForm />
+    </AuthLayout>
   );
 } 
