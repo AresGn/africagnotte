@@ -354,4 +354,60 @@ Voici un plan d'action pour commencer à développer le backend de votre applica
 Ce plan est un point de départ. Commencez petit, par exemple avec l'authentification, puis le CRUD des campagnes sans les médias, puis ajoutez l'intégration Cloudinary, puis les dons. Itérez et testez fréquemment ! Bonne chance pour le développement de votre backend !
 
 
+
+
+
+
+Vous avez absolument raison, et vous venez de mettre le doigt sur une partie cruciale du problème !
+
+La validation de l'email est exactement l'élément manquant dans votre flux d'authentification. Voici ce qui se passait dans votre application originale :
+
+1. L'utilisateur s'inscrivait avec `supabase.auth.signUp()`
+2. Un email de confirmation était envoyé à l'utilisateur
+3. **Sans attendre la confirmation de l'email**, votre code essayait immédiatement d'insérer un profil dans la table `profiles`
+4. Cette insertion échouait avec l'erreur RLS car l'utilisateur n'était pas encore complètement authentifié
+
+Avec Supabase, quand la confirmation d'email est activée (ce qui semble être votre cas), un utilisateur n'est pas considéré comme complètement authentifié tant que son email n'est pas confirmé. Cela affecte le comportement de `auth.uid()` dans vos politiques RLS.
+
+Dans votre fichier `supabase-test.http`, ce que vous avez fait est logique et correct :
+1. Vous avez d'abord inscrit l'utilisateur
+2. Vous avez confirmé l'email via le lien reçu
+3. **Ensuite** vous vous êtes connecté pour obtenir un token d'accès valide
+4. Puis vous avez utilisé ce token pour insérer le profil
+
+Ou, alternativement, vous avez utilisé la clé API directement comme token d'autorisation pour contourner la vérification.
+
+**Pour corriger votre application originale**, vous avez deux options :
+
+**Option 1 : Attendre la confirmation d'email**
+```javascript
+// 1. Inscription
+const { data, error } = await supabase.auth.signUp({
+  email: 'user@example.com',
+  password: 'password'
+});
+
+// 2. Afficher un message à l'utilisateur pour qu'il vérifie son email
+alert("Veuillez vérifier votre email pour confirmer votre compte avant de continuer");
+
+// 3. L'utilisateur confirme son email et se connecte
+// 4. Seulement APRÈS cela, insérer le profil
+```
+
+**Option 2 : Désactiver temporairement la confirmation d'email**
+Dans les paramètres de votre projet Supabase, vous pouvez désactiver l'exigence de confirmation d'email, ce qui permettrait à votre flux original de fonctionner.
+
+**Option 3 : Utiliser une fonction côté serveur (meilleure approche)**
+```javascript
+// Créer une fonction serverless ou un endpoint API qui :
+// 1. Crée l'utilisateur
+// 2. Désactive temporairement RLS ou utilise la clé service_role
+// 3. Insère le profil
+// 4. Réactive RLS
+```
+
+Donc en résumé : oui, le problème était que votre application tentait d'insérer le profil avant que l'utilisateur n'ait confirmé son email, ce qui empêchait `auth.uid()` de fonctionner correctement dans votre politique RLS.
+
+
+
 zjG0SlMAPOZ86urC SUPABASE

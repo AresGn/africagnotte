@@ -2,10 +2,8 @@
 
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', content: '' });
   const [formData, setFormData] = useState({
@@ -52,35 +50,71 @@ export default function LoginForm() {
           throw profileError;
         }
         
-        // Si le profil n'existe pas, le créer à partir des métadonnées
+        // Si le profil n'existe pas, vérifier d'abord s'il y a des données en attente dans localStorage
         if (!profileData) {
-          const metadata = data.user.user_metadata;
+          let profileToInsert;
           
-          if (metadata) {
-            const { error: insertError } = await supabase
-              .from('profiles')
-              .insert({
+          // Vérifier si nous avons des données de profil en attente dans localStorage
+          const pendingProfileData = localStorage.getItem('pendingProfileData');
+          
+          if (pendingProfileData) {
+            try {
+              profileToInsert = JSON.parse(pendingProfileData);
+              console.log("Utilisation des données de profil en attente trouvées dans localStorage.");
+            } catch (e) {
+              console.error("Erreur lors de l'analyse des données de profil en attente:", e);
+            }
+          }
+          
+          // Si aucune donnée en attente ou erreur de parsing, utiliser les métadonnées utilisateur
+          if (!profileToInsert) {
+            const metadata = data.user.user_metadata;
+            
+            if (metadata) {
+              profileToInsert = {
                 id: data.user.id,
                 first_name: metadata.first_name || '',
                 last_name: metadata.last_name || '',
                 username: metadata.username || '',
                 phone_number: metadata.phone_number || '',
                 country: metadata.country || ''
-              });
+              };
+            }
+          }
+          
+          // Insérer le profil si nous avons des données
+          if (profileToInsert) {
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert(profileToInsert);
               
             if (insertError) {
               console.error('Erreur lors de la création du profil:', insertError);
+              throw new Error(`Impossible de créer votre profil: ${insertError.message}`);
+            } else {
+              console.log("Profil utilisateur créé avec succès après confirmation de l'email.");
+              
+              // Supprimer les données en attente du localStorage après succès
+              localStorage.removeItem('pendingProfileData');
+              
+              // Message de succès spécifique pour la création de profil
+              setMessage({ 
+                type: 'success', 
+                content: 'Connexion réussie et profil créé ! Redirection...' 
+              });
             }
           }
+        } else {
+          setMessage({ 
+            type: 'success', 
+            content: 'Connexion réussie ! Redirection...' 
+          });
         }
         
-        setMessage({ 
-          type: 'success', 
-          content: 'Connexion réussie ! Redirection...' 
-        });
-        
-        // Rediriger vers la page d'accueil
-        router.push('/');
+        // Rediriger vers la page d'accueil après une pause pour montrer le message
+        setTimeout(() => {
+          window.location.href = '/';  // Utiliser window.location.href au lieu de router.push pour forcer un rechargement complet
+        }, 2000);
       }
     } catch (error: unknown) {
       console.error('Erreur de connexion:', error);

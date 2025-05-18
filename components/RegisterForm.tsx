@@ -98,69 +98,31 @@ export default function RegisterForm() {
         throw error;
       }
       
-      // Étape 3: Créer le profil utilisateur dans la table profiles
+      // L'utilisateur a été créé avec succès
       if (data.user) {
-        console.log("Création du profil utilisateur...");
-        try {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              first_name: formData.firstName,
-              last_name: formData.lastName,
-              username: formData.username,
-              phone_number: formData.phoneNumber,
-              country: formData.country
-            });
-          
-          if (profileError) {
-            console.error("Erreur lors de la création du profil:", profileError);
-            
-            // Si l'erreur est que la table n'existe pas, on affiche un message spécifique
-            if (profileError.message && profileError.message.includes('does not exist')) {
-              console.warn("La table profiles n'existe pas, mais l'utilisateur a été créé");
-              // L'utilisateur est quand même créé, on affiche un message de succès
-              setMessage({ 
-                type: 'success', 
-                content: 'Inscription réussie ! Veuillez vérifier votre email pour confirmer votre compte. Note: La table profiles n\'existe pas encore, contactez l\'administrateur.' 
-              });
-              setTimeout(() => {
-                router.push('/');
-              }, 5000);
-              setLoading(false);
-              return;
-            } else {
-              throw profileError;
-            }
-          }
-        } catch (profileInsertError) {
-          // Si l'erreur est que la table n'existe pas, on affiche un message spécifique
-          if (profileInsertError instanceof Error && profileInsertError.message.includes('does not exist')) {
-            console.warn("La table profiles n'existe pas, mais l'utilisateur a été créé");
-            // L'utilisateur est quand même créé, on affiche un message de succès
-            setMessage({ 
-              type: 'success', 
-              content: 'Inscription réussie ! Veuillez vérifier votre email pour confirmer votre compte. Note: La table profiles n\'existe pas encore, contactez l\'administrateur.' 
-            });
-            setTimeout(() => {
-              router.push('/');
-            }, 5000);
-            setLoading(false);
-            return;
-          } else {
-            throw profileInsertError;
-          }
-        }
+        // Stocker les données du profil dans localStorage pour les utiliser après confirmation de l'email
+        const profileData = {
+          id: data.user.id,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          username: formData.username,
+          phone_number: formData.phoneNumber,
+          country: formData.country
+        };
         
+        localStorage.setItem('pendingProfileData', JSON.stringify(profileData));
+        localStorage.setItem('registeredEmail', formData.email);
+        
+        // Afficher un message demandant à l'utilisateur de vérifier son email
         setMessage({ 
           type: 'success', 
-          content: 'Inscription réussie ! Veuillez vérifier votre email pour confirmer votre compte.' 
+          content: 'Inscription réussie ! Redirection vers la page de vérification d\'email...'
         });
         
-        // Rediriger après un délai
+        // Rediriger vers la page de vérification d'email
         setTimeout(() => {
-          router.push('/');
-        }, 5000);
+          router.push('/verify');
+        }, 2000);
       }
     } catch (error: unknown) {
       console.error('Erreur d\'inscription détaillée:', error);
