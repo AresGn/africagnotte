@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { FaCamera, FaBold, FaUnderline, FaImage, FaLink, FaVideo } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
+import { FaBold, FaUnderline, FaImage, FaLink, FaVideo } from 'react-icons/fa';
+import MediaUpload from '../../components/MediaUpload';
+import { useAuth } from '../../contexts/AuthContext';
+import { toast, Toaster } from 'react-hot-toast';
 
 // Utilisation des mêmes catégories que sur la page d'accueil
 const categories = [
@@ -12,27 +16,119 @@ const categories = [
 ];
 
 export default function CreerCagnotte() {
+  const { user, isAuthenticated, isLoading: authIsLoading } = useAuth();
   const [title, setTitle] = useState('');
   const [customUrl, setCustomUrl] = useState('');
   const [category, setCategory] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [showTarget, setShowTarget] = useState(false);
+  const [targetAmount, setTargetAmount] = useState<number | null>(null);
   const [hideAmount, setHideAmount] = useState(false);
   const [showParticipants, setShowParticipants] = useState(true);
   const [description, setDescription] = useState('Quel que soit le montant, chacun peut participer à cette cagnotte. Pas besoin de créer un compte ou de s&apos;inscrire, c&apos;est rapide et les paiements par Carte Bancaire sont 100% sécurisés.\n\nSi vous ne pouvez pas participer financièrement, partagez cette cagnotte autour de vous au maximum. MERCI !');
+  const [images, setImages] = useState<string[]>([]);
+  const [video, setVideo] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleImagesUpload = (uploadedImages: string[]) => {
+    setImages(uploadedImages);
+  };
+
+  const handleVideoUpload = (uploadedVideo: string) => {
+    setVideo(uploadedVideo);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (authIsLoading) {
+      toast.error('Veuillez patienter, vérification de l\'authentification...');
+      return;
+    }
+
+    if (!isAuthenticated || !user) {
+      toast.error('Vous devez vous connecter pour créer une cagnotte');
+      router.push('/connexion');
+      return;
+    }
+    
+    if (!title || !category) {
+      toast.error('Veuillez remplir les champs Titre et Catégorie');
+      return;
+    }
+    if (images.length === 0) {
+      toast.error('Veuillez ajouter au moins une image');
+      return;
+    }
+    if (showTarget && (!targetAmount || targetAmount <= 0)) {
+      toast.error('Veuillez définir un montant à atteindre valide');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      
+      const cagnotteData = {
+        title,
+        custom_url: customUrl || null,
+        category,
+        description,
+        images: JSON.stringify(images),
+        video: video || null,
+        is_private: isPrivate,
+        show_target: showTarget,
+        target_amount: showTarget ? targetAmount : null,
+        hide_amount: hideAmount,
+        show_participants: showParticipants,
+      };
+      
+      const response = await fetch('/api/cagnottes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cagnotteData),
+      });
+      
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.error('Erreur lors de la création de la cagnotte (API):', responseData);
+        toast.error(responseData.error || 'Erreur lors de la création de la cagnotte');
+        return;
+      }
+      
+      toast.success('Votre cagnotte a été créée avec succès');
+      
+      if (responseData.custom_url) {
+        router.push(`/c/${responseData.custom_url}`);
+      } else {
+        router.push(`/c/${responseData.id}`);
+      }
+      
+    } catch (error) {
+      console.error('Erreur inattendue lors de la création:', error);
+      toast.error('Une erreur inattendue est survenue');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="py-6 sm:py-10 bg-gray-50">
       <div className="container mx-auto max-w-3xl px-4">
+        <Toaster position="top-center" />
         <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-10">Créer une cagnotte</h1>
         
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
-          <div className="mb-6 sm:mb-8 p-6 sm:p-10 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="bg-gray-200 rounded-full p-3 sm:p-4 mb-2">
-              <FaCamera className="text-gray-500 text-xl sm:text-3xl" />
-            </div>
-            <p className="text-base sm:text-lg font-medium text-gray-600">Sélectionnez l&apos;image principale</p>
-          </div>
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
+          {/* Upload de médias (images/vidéo) */}
+          <MediaUpload 
+            images={images}
+            video={video}
+            onImagesUpload={handleImagesUpload}
+            onVideoUpload={handleVideoUpload}
+          />
           
           <div className="mb-5 sm:mb-6">
             <div className="flex justify-between items-center mb-2">
@@ -47,6 +143,7 @@ export default function CreerCagnotte() {
               maxLength={50}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              required
             />
           </div>
           
@@ -77,6 +174,7 @@ export default function CreerCagnotte() {
                 className="appearance-none w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 pr-10 text-sm sm:text-base"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
+                required
               >
                 <option value="" disabled>Sélectionnez une catégorie</option>
                 {categories.map((cat) => (
@@ -137,22 +235,41 @@ export default function CreerCagnotte() {
             </div>
           </div>
           
+          {showTarget && (
+            <div className="mb-5 sm:mb-6">
+              <label htmlFor="targetAmount" className="block text-base sm:text-lg font-semibold mb-2">Montant à atteindre</label>
+              <div className="flex items-center w-full">
+                <input 
+                  type="number" 
+                  id="targetAmount" 
+                  placeholder="1000" 
+                  min="1"
+                  className="flex-1 p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                  value={targetAmount || ''}
+                  onChange={(e) => setTargetAmount(parseInt(e.target.value) || null)}
+                  required={showTarget}
+                />
+                <span className="ml-2 text-gray-700 font-medium">€</span>
+              </div>
+            </div>
+          )}
+          
           <div className="mb-5 sm:mb-6">
             <label htmlFor="description" className="block text-base sm:text-lg font-semibold mb-2">Description</label>
             <div className="mb-2 flex space-x-2 border-b pb-2">
-              <button className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
+              <button type="button" className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
                 <FaBold className="text-xs sm:text-sm" />
               </button>
-              <button className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
+              <button type="button" className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
                 <FaUnderline className="text-xs sm:text-sm" />
               </button>
-              <button className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
+              <button type="button" className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
                 <FaImage className="text-xs sm:text-sm" />
               </button>
-              <button className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
+              <button type="button" className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
                 <FaLink className="text-xs sm:text-sm" />
               </button>
-              <button className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
+              <button type="button" className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded">
                 <FaVideo className="text-xs sm:text-sm" />
               </button>
             </div>
@@ -161,17 +278,20 @@ export default function CreerCagnotte() {
               className="w-full p-2 sm:p-3 bg-gray-100 rounded-md min-h-[150px] sm:min-h-[200px] focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              required
             ></textarea>
           </div>
           
           <div className="text-center">
             <button 
+              type="submit"
               className="bg-lime-500 hover:bg-lime-600 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-md text-base sm:text-xl transition-colors"
+              disabled={loading}
             >
-              Lancer ma cagnotte
+              {loading ? 'Création en cours...' : 'Lancer ma cagnotte'}
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </main>
   );

@@ -1,24 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import Navbar from '../../components/Navbar';
+import { useRouter } from 'next/navigation';
 
 export default function ParametresPage() {
-  const [loading, setLoading] = useState(true);
+  const { isLoading: authIsLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est connecté
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        window.location.href = '/connexion';
-      }
-      setLoading(false);
-    };
-    
-    checkUser();
-  }, []);
+    if (authIsLoading) {
+      setPageLoading(true);
+      return;
+    }
+
+    if (!isAuthenticated) {
+      router.push('/connexion');
+      return;
+    }
+    setPageLoading(false);
+
+  }, [authIsLoading, isAuthenticated, router]);
 
   return (
     <>
@@ -26,7 +30,7 @@ export default function ParametresPage() {
       <div className="container-custom pt-24 pb-12">
         <h1 className="text-3xl font-bold mb-8">Paramètres</h1>
         
-        {loading ? (
+        {pageLoading ? (
           <div className="text-center py-12">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" style={{ color: 'var(--primary-color)' }}></div>
             <p className="mt-4">Chargement des paramètres...</p>
