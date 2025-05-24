@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import UserAuthStatus from './UserAuthStatus';
+// import UserAuthStatus from './UserAuthStatus'; // Supprimé
 
 export default function Header() {
   return (
@@ -27,9 +27,10 @@ export default function Header() {
               Rechercher
             </Link>
           </nav>
-          <div className="flex items-center">
+          {/* Emplacement pour UserAuthStatus, à redéfinir si nécessaire */}
+          {/* <div className="flex items-center">
             <UserAuthStatus />
-          </div>
+          </div> */}
         </div>
       </div>
     </header>

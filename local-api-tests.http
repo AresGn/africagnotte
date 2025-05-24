@@ -1,0 +1,96 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+
+### S'inscrire (Sign Up) - Nouvelle API Locale
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "testlocal@example.com",
+  "password": "password123",
+  "raw_user_meta_data": {
+    "full_name": "Test Local User",
+    "firstName": "Test",
+    "lastName": "Local",
+    "country": "France"
+  }
+}
+
+### S'inscrire (Sign Up) - Un autre utilisateur
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "anotherlocal@example.com",
+  "password": "securepassword",
+  "raw_user_meta_data": {
+    "full_name": "Another Local User"
+  }
+}
+
+### S'inscrire (Sign Up) - Email déjà existant (devrait échouer)
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "testlocal@example.com",
+  "password": "newpassword"
+}
+
+
+### S'inscrire (Sign Up) - Champs manquants (devrait échouer)
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "incomplete@example.com"
+}
+
+### Se connecter (Sign In) - API Locale
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "testlocal@example.com",
+  "password": "password123"
+}
+
+### Se connecter (Sign In) - Mauvais mot de passe
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "testlocal@example.com",
+  "password": "wrongpassword"
+}
+
+### Se connecter (Sign In) - Utilisateur inconnu
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "unknown@example.com",
+  "password": "password123"
+}
+
+###
+# @name loginTestUser
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "testlocal@example.com",
+  "password": "password123"
+}
+
+### Récupérer les informations de l'utilisateur (protégé)
+# S'assure d'avoir exécuté la requête loginTestUser avant pour que {{loginTestUser.response.body.token}} soit défini
+GET {{baseUrl}}/me
+Authorization: Bearer {{loginTestUser.response.body.token}}
+
+### Récupérer les informations de l'utilisateur (protégé) - Sans Token
+GET {{baseUrl}}/me
+
+### Récupérer les informations de l'utilisateur (protégé) - Mauvais Token
+GET {{baseUrl}}/me
+Authorization: Bearer mauvais.token.ici 

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
+// import { useRouter } from 'next/navigation'; // Plus utilisé directement ici
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -10,6 +11,8 @@ export default function LoginForm() {
     email: '',
     password: ''
   });
+  // const router = useRouter(); // Supprimé car la redirection est dans AuthContext
+  const context = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,100 +25,32 @@ export default function LoginForm() {
     setMessage({ type: '', content: '' });
 
     try {
-      // Tentative de connexion
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
 
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          throw new Error('Email ou mot de passe incorrect');
-        } else if (error.message.includes('Email not confirmed')) {
-          throw new Error('Veuillez confirmer votre adresse email avant de vous connecter');
-        } else {
-          throw error;
-        }
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Erreur de connexion');
       }
 
-      if (data.user) {
-        // Vérifier que le profil existe dans la table profiles
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-          
-        if (profileError && profileError.code !== 'PGRST116') {
-          throw profileError;
-        }
-        
-        // Si le profil n'existe pas, vérifier d'abord s'il y a des données en attente dans localStorage
-        if (!profileData) {
-          let profileToInsert;
-          
-          // Vérifier si nous avons des données de profil en attente dans localStorage
-          const pendingProfileData = localStorage.getItem('pendingProfileData');
-          
-          if (pendingProfileData) {
-            try {
-              profileToInsert = JSON.parse(pendingProfileData);
-              console.log("Utilisation des données de profil en attente trouvées dans localStorage.");
-            } catch (e) {
-              console.error("Erreur lors de l'analyse des données de profil en attente:", e);
-            }
-          }
-          
-          // Si aucune donnée en attente ou erreur de parsing, utiliser les métadonnées utilisateur
-          if (!profileToInsert) {
-            const metadata = data.user.user_metadata;
-            
-            if (metadata) {
-              profileToInsert = {
-                id: data.user.id,
-                first_name: metadata.first_name || '',
-                last_name: metadata.last_name || '',
-                username: metadata.username || '',
-                phone_number: metadata.phone_number || '',
-                country: metadata.country || ''
-              };
-            }
-          }
-          
-          // Insérer le profil si nous avons des données
-          if (profileToInsert) {
-            const { error: insertError } = await supabase
-              .from('profiles')
-              .insert(profileToInsert);
-              
-            if (insertError) {
-              console.error('Erreur lors de la création du profil:', insertError);
-              throw new Error(`Impossible de créer votre profil: ${insertError.message}`);
-            } else {
-              console.log("Profil utilisateur créé avec succès après confirmation de l'email.");
-              
-              // Supprimer les données en attente du localStorage après succès
-              localStorage.removeItem('pendingProfileData');
-              
-              // Message de succès spécifique pour la création de profil
-              setMessage({ 
-                type: 'success', 
-                content: 'Connexion réussie et profil créé ! Redirection...' 
-              });
-            }
-          }
-        } else {
-          setMessage({ 
-            type: 'success', 
-            content: 'Connexion réussie ! Redirection...' 
-          });
-        }
-        
-        // Rediriger vers la page d'accueil après une pause pour montrer le message
-        setTimeout(() => {
-          window.location.href = '/';  // Utiliser window.location.href au lieu de router.push pour forcer un rechargement complet
-        }, 2000);
-      }
+      await context.signIn(formData);
+
+      setMessage({ 
+        type: 'success', 
+        content: 'Connexion réussie ! Redirection...' 
+      });
+      
+      // La redirection est maintenant gérée par AuthContext après la mise à jour de l'utilisateur
+      // setTimeout(() => {
+      //   router.push('/'); 
+      // }, 1000); 
+
     } catch (error: unknown) {
       console.error('Erreur de connexion:', error);
       const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de la connexion.';

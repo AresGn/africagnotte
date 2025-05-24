@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { useRouter } from 'next/navigation';
-import { AuthError } from '@supabase/supabase-js';
 
 // Pays utilisant le XOF (Union Économique et Monétaire Ouest-Africaine)
 const XOF_COUNTRIES = [
@@ -43,104 +41,47 @@ export default function RegisterForm() {
     setMessage({ type: '', content: '' });
     
     try {
-      // Étape 1: Vérifier si le nom d'utilisateur existe déjà
-      console.log("Vérification du nom d'utilisateur...");
-      try {
-        const { data: existingUsers, error: usernameError } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('username', formData.username);
-          
-        if (usernameError) {
-          console.error("Erreur lors de la vérification du nom d'utilisateur:", usernameError);
-          // Si l'erreur est que la table n'existe pas, on continue
-          if (usernameError.message && usernameError.message.includes('does not exist')) {
-            console.log("La table profiles n'existe pas encore, on continue avec l'inscription");
-          } else {
-            throw usernameError;
-          }
-        } else if (existingUsers && existingUsers.length > 0) {
-          setMessage({
-            type: 'error',
-            content: 'Ce nom d\'utilisateur est déjà utilisé. Veuillez en choisir un autre.'
-          });
-          setLoading(false);
-          return;
+      const { email, password, firstName, lastName, username, phoneNumber, country } = formData;
+      
+      const payload = {
+        email,
+        password,
+        raw_user_meta_data: {
+          first_name: firstName,
+          last_name: lastName,
+          username,
+          phone_number: phoneNumber,
+          country,
+          full_name: `${firstName} ${lastName}`
         }
-      } catch (verifyError) {
-        // Si l'erreur est que la table n'existe pas, on continue
-        if (verifyError instanceof Error && verifyError.message.includes('does not exist')) {
-          console.log("La table profiles n'existe pas encore, on continue avec l'inscription");
-        } else {
-          throw verifyError;
-        }
-      }
+      };
 
-      // Étape 2: Créer l'utilisateur dans Supabase Auth
-      console.log("Création de l'utilisateur...");
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            username: formData.username,
-            phone_number: formData.phoneNumber,
-            country: formData.country
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Erreur d\'inscription');
+      }
+      
+      setMessage({ 
+        type: 'success', 
+        content: 'Inscription réussie ! Vous pouvez maintenant vous connecter.'
       });
       
-      if (error) {
-        console.error("Erreur lors de la création de l'utilisateur:", error);
-        throw error;
-      }
-      
-      // L'utilisateur a été créé avec succès
-      if (data.user) {
-        // Stocker les données du profil dans localStorage pour les utiliser après confirmation de l'email
-        const profileData = {
-          id: data.user.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          username: formData.username,
-          phone_number: formData.phoneNumber,
-          country: formData.country
-        };
-        
-        localStorage.setItem('pendingProfileData', JSON.stringify(profileData));
-        localStorage.setItem('registeredEmail', formData.email);
-        
-        // Afficher un message demandant à l'utilisateur de vérifier son email
-        setMessage({ 
-          type: 'success', 
-          content: 'Inscription réussie ! Redirection vers la page de vérification d\'email...'
-        });
-        
-        // Rediriger vers la page de vérification d'email
-        setTimeout(() => {
-          router.push('/verify');
-        }, 2000);
-      }
+      setTimeout(() => {
+        router.push('/connexion');
+      }, 2000);
+
     } catch (error: unknown) {
       console.error('Erreur d\'inscription détaillée:', error);
-      let errorMessage = 'Une erreur est survenue lors de l\'inscription.';
-      
-      if (error instanceof AuthError) {
-        if (error.message.includes('relation "profiles" does not exist')) {
-          errorMessage = 'La table "profiles" n\'existe pas dans la base de données. Contactez l\'administrateur.';
-        } else {
-          errorMessage = error.message;
-        }
-      } else if (error instanceof Error) {
-        if (error.message.includes('relation "profiles" does not exist')) {
-          errorMessage = 'La table "profiles" n\'existe pas dans la base de données. Contactez l\'administrateur.';
-        } else {
-          errorMessage = error.message;
-        }
-      }
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'inscription.';
       
       setMessage({ 
         type: 'error', 
@@ -248,7 +189,7 @@ export default function RegisterForm() {
         
         <div>
           <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">Pays de résidence</label>
-          <select 
+          <select
             id="country"
             name="country"
             required
@@ -258,18 +199,14 @@ export default function RegisterForm() {
             style={{ '--tw-ring-color': 'var(--primary-color)' } as React.CSSProperties}
           >
             <option value="">Sélectionnez votre pays</option>
-            <optgroup label="Pays utilisant le XOF">
+            <optgroup label="Zone XOF">
               {XOF_COUNTRIES.map(country => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
+                <option key={country} value={country}>{country}</option>
               ))}
             </optgroup>
-            <optgroup label="Pays utilisant le XAF">
+            <optgroup label="Zone XAF">
               {XAF_COUNTRIES.map(country => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
+                <option key={country} value={country}>{country}</option>
               ))}
             </optgroup>
           </select>
