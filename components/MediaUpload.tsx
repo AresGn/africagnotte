@@ -13,28 +13,36 @@ interface MediaUploadProps {
 export default function MediaUpload({ onImagesUpload, onVideoUpload, images, video }: MediaUploadProps) {
   const [isVideoUploaded, setIsVideoUploaded] = useState(!!video);
 
+
+
   const handleImageUpload = (results: CloudinaryUploadWidgetResults) => {
-    if (results.event !== 'success' || !results.info) return;
-    
-    const info = results.info;
-    const newImageUrl = typeof info === 'string' ? info : info.secure_url;
-    
-    if (newImageUrl) {
-      onImagesUpload([...images, newImageUrl]);
+    if (results.event === 'success' && results.info) {
+      const info = results.info;
+      const newImageUrl = typeof info === 'string' ? info : info.secure_url;
+
+      if (newImageUrl) {
+        onImagesUpload([...images, newImageUrl]);
+      }
+    } else if (results.event === 'error') {
+      console.error('❌ Image upload error:', results);
+      alert('Erreur lors du téléchargement de l\'image. Vérifiez que le preset Cloudinary est configuré.');
     }
   };
 
   const handleVideoUpload = (results: CloudinaryUploadWidgetResults) => {
-    if (results.event !== 'success' || !results.info) return;
-    
-    const info = results.info;
-    
-    if (typeof info !== 'string' && info.resource_type === 'video') {
-      const videoUrl = info.secure_url;
-      onVideoUpload(videoUrl);
-      setIsVideoUploaded(true);
-    } else {
-      alert('Veuillez télécharger une vidéo.');
+    if (results.event === 'success' && results.info) {
+      const info = results.info;
+
+      if (typeof info !== 'string' && info.resource_type === 'video') {
+        const videoUrl = info.secure_url;
+        onVideoUpload(videoUrl);
+        setIsVideoUploaded(true);
+      } else {
+        alert('Veuillez télécharger une vidéo.');
+      }
+    } else if (results.event === 'error') {
+      console.error('❌ Video upload error:', results);
+      alert('Erreur lors du téléchargement de la vidéo. Vérifiez que le preset Cloudinary est configuré.');
     }
   };
 
@@ -55,13 +63,13 @@ export default function MediaUpload({ onImagesUpload, onVideoUpload, images, vid
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {images.map((imageUrl, index) => (
             <div key={index} className="relative h-24 sm:h-32 border rounded overflow-hidden">
-              <Image 
-                src={imageUrl} 
-                alt={`Image ${index + 1}`} 
-                fill 
-                className="object-cover" 
+              <Image
+                src={imageUrl}
+                alt={`Image ${index + 1}`}
+                fill
+                className="object-cover"
               />
-              <button 
+              <button
                 className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full"
                 onClick={() => removeImage(index)}
                 type="button"
@@ -70,11 +78,15 @@ export default function MediaUpload({ onImagesUpload, onVideoUpload, images, vid
               </button>
             </div>
           ))}
-          
+
           {/* Bouton pour ajouter des images */}
-          <CldUploadWidget 
+          <CldUploadWidget
             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
             onUpload={handleImageUpload}
+            onError={(error) => {
+              console.error('❌ Cloudinary widget error (image):', error);
+              alert('Erreur du widget Cloudinary. Vérifiez votre configuration.');
+            }}
             options={{
               sources: ['local', 'url'],
               multiple: false,
@@ -83,7 +95,7 @@ export default function MediaUpload({ onImagesUpload, onVideoUpload, images, vid
             }}
           >
             {({ open }) => (
-              <div 
+              <div
                 className="h-24 sm:h-32 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => open()}
               >
@@ -100,15 +112,15 @@ export default function MediaUpload({ onImagesUpload, onVideoUpload, images, vid
       {/* Section upload de vidéo (une seule) */}
       <div className="mb-4">
         <h3 className="text-base sm:text-lg font-semibold mb-2">Vidéo (optionnelle)</h3>
-        
+
         {video && isVideoUploaded ? (
           <div className="relative mb-3">
-            <video 
-              src={video} 
-              controls 
+            <video
+              src={video}
+              controls
               className="w-full h-40 sm:h-56 object-cover rounded border"
             />
-            <button 
+            <button
               className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
               onClick={removeVideo}
               type="button"
@@ -117,9 +129,13 @@ export default function MediaUpload({ onImagesUpload, onVideoUpload, images, vid
             </button>
           </div>
         ) : (
-          <CldUploadWidget 
+          <CldUploadWidget
             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-            onSuccess={handleVideoUpload}
+            onUpload={handleVideoUpload}
+            onError={(error) => {
+              console.error('❌ Cloudinary widget error (video):', error);
+              alert('Erreur du widget Cloudinary. Vérifiez votre configuration.');
+            }}
             options={{
               sources: ['local', 'url'],
               multiple: false,
@@ -128,7 +144,7 @@ export default function MediaUpload({ onImagesUpload, onVideoUpload, images, vid
             }}
           >
             {({ open }) => (
-              <div 
+              <div
                 className="p-6 sm:p-10 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => open()}
               >
@@ -144,4 +160,4 @@ export default function MediaUpload({ onImagesUpload, onVideoUpload, images, vid
       </div>
     </div>
   );
-} 
+}

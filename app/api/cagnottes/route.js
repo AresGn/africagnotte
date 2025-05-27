@@ -13,7 +13,7 @@ export async function GET(request) {
 
   try {
     const client = await pool.connect();
-    // Supposons que votre table de cagnottes s'appelle 'cagnottes' 
+    // Supposons que votre table de cagnottes s'appelle 'cagnottes'
     // et qu'elle a une colonne 'user_id' ou 'creator_id' qui référence l'ID de l'utilisateur.
     // Adaptez le nom de la table et de la colonne si nécessaire.
     const result = await client.query(
@@ -101,4 +101,27 @@ export async function POST(request) {
     }
     return NextResponse.json({ error: 'Erreur interne du serveur lors de la création de la cagnotte.' }, { status: 500 });
   }
-} 
+}
+
+// Fonction utilitaire pour valider les données de cagnotte
+function validateCagnotteData(data) {
+  const errors = [];
+
+  if (!data.title || data.title.trim().length === 0) {
+    errors.push('Le titre est requis');
+  }
+  if (data.title && data.title.length > 50) {
+    errors.push('Le titre ne peut pas dépasser 50 caractères');
+  }
+  if (!data.category || data.category.trim().length === 0) {
+    errors.push('La catégorie est requise');
+  }
+  if (!data.description || data.description.trim().length === 0) {
+    errors.push('La description est requise');
+  }
+  if (data.show_target && (!data.target_amount || data.target_amount <= 0)) {
+    errors.push('Le montant cible doit être supérieur à 0 quand l\'affichage de l\'objectif est activé');
+  }
+
+  return errors;
+}

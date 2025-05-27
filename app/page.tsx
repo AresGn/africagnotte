@@ -7,9 +7,10 @@ import { AnimatedTestimonialsDemo } from './components/ui/animated-testimonials-
 import { CategoryTabsDemo } from './components/ui/category-tabs-demo';
 
 // Sample data - in a real app, this would come from an API/database
+// Using valid UUIDs for consistency with database schema
 const campaigns = [
   {
-    id: 1,
+    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     imageUrl: '/images/campaign-1.webp',
     title: 'Soutien médical pour les enfants',
     description: 'Aidez-nous à financer des soins médicaux pour les enfants malades dans la région de Dakar.',
@@ -18,7 +19,7 @@ const campaigns = [
     targetAmount: 10000000
   },
   {
-    id: 2,
+    id: 'b2c3d4e5-f6g7-8901-bcde-f23456789012',
     imageUrl: '/images/campaign-2.jpg',
     title: 'Reconstruction après les inondations',
     description: 'Soutenez les familles qui ont tout perdu lors des récentes inondations.',
@@ -27,7 +28,7 @@ const campaigns = [
     targetAmount: 5000000
   },
   {
-    id: 3,
+    id: 'c3d4e5f6-g7h8-9012-cdef-345678901234',
     imageUrl: '/images/campaign-3.jpeg',
     title: 'Éducation pour orphelins',
     description: 'Aidez-nous à offrir une éducation de qualité aux orphelins de notre communauté.',
@@ -83,7 +84,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
+
       {/* How it works section */}
       <section className="py-16 bg-white">
         <div className="container-custom">
@@ -142,4 +143,4 @@ export default function Home() {
       <Footer />
     </main>
   );
-} 
+}

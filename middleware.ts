@@ -14,7 +14,11 @@ import { jwtVerify, errors as JoseErrors } from 'jose'; // Import de jwtVerify e
 // Pour l'instant, nous allons créer une route de test /api/me
 // et le matcher la ciblera pour la démonstration.
 export const config = {
-  matcher: ['/api/me/:path*', '/api/cagnottes/:path*', '/api/profile/:path*'], // Exemple: protège /api/me et tout ce qui suit, et ajoute /api/cagnottes et /api/profile
+  matcher: [
+    '/api/me/:path*',
+    '/api/cagnottes/:path*',
+    '/api/profile/:path*'
+  ], // Protège /api/me, /api/cagnottes (y compris les nouvelles routes [id]) et /api/profile
 };
 
 async function getKey(secret: string) {
@@ -93,4 +97,4 @@ export async function middleware(request: NextRequest) {
     }
     return NextResponse.json({ error: `Authentication failed: ${errorMessage}` }, { status: 401 });
   }
-} 
+}

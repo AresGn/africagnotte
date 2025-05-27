@@ -27,7 +27,7 @@ export default function CampaignCard({
 }: CampaignCardProps) {
   const [imgError, setImgError] = useState(false);
   const progressPercentage = Math.min(Math.round((currentAmount / targetAmount) * 100), 100);
-  
+
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('fr-FR').format(amount);
   };
@@ -36,16 +36,16 @@ export default function CampaignCard({
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="relative h-48">
         {imgError ? (
-          <div 
+          <div
             className="w-full h-full flex items-center justify-center bg-gray-200"
             style={{ color: 'var(--primary-color)' }}
           >
             <span>{title}</span>
           </div>
         ) : (
-          <Image 
-            src={imageUrl} 
-            alt={title} 
+          <Image
+            src={imageUrl}
+            alt={title}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
             style={{ objectFit: 'cover' }}
@@ -54,7 +54,7 @@ export default function CampaignCard({
         )}
       </div>
       <div className="p-6">
-        <span className="inline-block px-3 py-1 text-xs rounded-full mb-3" 
+        <span className="inline-block px-3 py-1 text-xs rounded-full mb-3"
             style={{ backgroundColor: 'var(--accent-color)', color: 'var(--dark-color)' }}>
           {category}
         </span>
@@ -66,11 +66,11 @@ export default function CampaignCard({
         </p>
         <div className="mb-4">
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="h-2 rounded-full" 
-              style={{ 
-                width: `${progressPercentage}%`, 
-                backgroundColor: 'var(--secondary-color)' 
+            <div
+              className="h-2 rounded-full"
+              style={{
+                width: `${progressPercentage}%`,
+                backgroundColor: 'var(--secondary-color)'
               }}
             ></div>
           </div>
@@ -79,10 +79,10 @@ export default function CampaignCard({
             <span>{formatAmount(targetAmount)} {currency}</span>
           </div>
         </div>
-        <Link href={`/cagnotte/${id}`} className="btn-primary w-full block text-center">
+        <Link href={`/c/${id}`} className="btn-primary w-full block text-center">
           Faire un don
         </Link>
       </div>
     </div>
   );
-} 
+}
