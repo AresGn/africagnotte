@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { FaChevronLeft, FaChevronRight, FaPlay, FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaPhone, FaSms, FaCopy, FaSortAmountDown } from 'react-icons/fa';
 
 // Données fictives pour la cagnotte (dans un projet réel, ces données viendraient d'une API)
+// Using valid UUID for consistency with database schema
 const mockCagnotte = {
-  id: 1,
+  id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   title: 'Soutien médical pour les enfants',
   description: 'Cette cagnotte a pour objectif de venir en aide aux enfants malades de la région de Dakar qui n\'ont pas les moyens de se soigner. Les fonds collectés serviront à acheter des médicaments, payer des consultations médicales et financer des opérations chirurgicales pour les cas les plus graves.',
   longDescription: `Il y a deux ans, nous avons découvert que de nombreux enfants de la région de Dakar n'avaient pas accès aux soins médicaux de base en raison de la pauvreté de leurs familles. Certains souffrent de maladies graves qui nécessitent des traitements coûteux, hors de portée pour la plupart des familles.
@@ -162,25 +163,73 @@ export default function CagnotteDetail() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const videoRef = useRef<HTMLIFrameElement>(null);
-  
-  const slideCount = mockCagnotte.images.length + (mockCagnotte.video ? 1 : 0);
-  
+
+  // États pour les données réelles
+  const [cagnotte, setCagnotte] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Récupérer les données de la cagnotte
+  useEffect(() => {
+    const fetchCagnotte = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/cagnottes/detail/${cagnotteId}`);
+
+        if (!response.ok) {
+          throw new Error('Cagnotte non trouvée');
+        }
+
+        const data = await response.json();
+        setCagnotte(data);
+      } catch (err) {
+        setError(err.message);
+        // En cas d'erreur, utiliser les données fictives pour le développement
+        setCagnotte(mockCagnotte);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (cagnotteId) {
+      fetchCagnotte();
+    }
+  }, [cagnotteId]);
+
+  // Utiliser les données réelles ou fictives
+  const currentCagnotte: any = cagnotte || mockCagnotte;
+  const slideCount = (currentCagnotte.images?.length || 0) + (currentCagnotte.video ? 1 : 0);
+
+  // Affichage de chargement
+  if (loading) {
+    return (
+      <main className="py-10 bg-gray-50">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Chargement de la cagnotte...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   // Gestion des onglets
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
-  
+
   // Navigation dans le slider
   const goToPrevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? slideCount - 1 : prev - 1));
     if (isVideoPlaying) setIsVideoPlaying(false);
   };
-  
+
   const goToNextSlide = () => {
     setCurrentSlide((prev) => (prev === slideCount - 1 ? 0 : prev + 1));
     if (isVideoPlaying) setIsVideoPlaying(false);
   };
-  
+
   // Formatage des dates et montants
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('fr-FR', {
@@ -189,7 +238,7 @@ export default function CagnotteDetail() {
       year: 'numeric'
     });
   };
-  
+
   const formatAmount = (amount: number) => {
     return amount.toLocaleString('fr-FR', {
       style: 'currency',
@@ -197,37 +246,38 @@ export default function CagnotteDetail() {
       maximumFractionDigits: 0
     });
   };
-  
+
   // Copier le lien de partage
   const handleCopyLink = () => {
     navigator.clipboard.writeText(`https://africagnotte.com/cagnotte/${cagnotteId}`);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
-  
-  // Trier les dons
-  const sortedDonations = [...mockCagnotte.donations].sort((a, b) => {
+
+  // Trier les dons (utiliser des données fictives pour les dons pour l'instant)
+  const donations = currentCagnotte.donations || mockCagnotte.donations;
+  const sortedDonations = [...donations].sort((a, b) => {
     if (sortByAmount) {
       return b.amount - a.amount;
     } else {
       return b.date.getTime() - a.date.getTime();
     }
   });
-  
+
   // Donations à afficher
   const visibleDonations = showAllDonations ? sortedDonations : sortedDonations.slice(0, 5);
-  
+
   // Démarrer la vidéo
   const playVideo = () => {
     setIsVideoPlaying(true);
   };
-  
+
   return (
     <main className="py-10 bg-gray-50">
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Titre de la cagnotte */}
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">{mockCagnotte.title}</h1>
-        
+        <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">{currentCagnotte.title}</h1>
+
         {/* Badge de confiance */}
         <div className="bg-green-100 border border-green-300 rounded-lg p-4 mb-8 flex items-center">
           <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white mr-4">
@@ -240,17 +290,17 @@ export default function CagnotteDetail() {
             <span className="text-sm">Cette cagnotte a été contrôlée et vérifiée par les équipes de AfricaGnotte.</span>
           </p>
         </div>
-        
+
         {/* Onglets */}
         <div className="mb-6 border-b border-gray-200">
           <div className="flex">
-            <button 
+            <button
               className={`py-3 px-6 font-medium text-lg ${activeTab === 'pourquoi' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-gray-500 hover:text-gray-700'}`}
               onClick={() => handleTabChange('pourquoi')}
             >
               Pourquoi ?
             </button>
-            <button 
+            <button
               className={`py-3 px-6 font-medium text-lg ${activeTab === 'infos' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-gray-500 hover:text-gray-700'}`}
               onClick={() => handleTabChange('infos')}
             >
@@ -258,7 +308,7 @@ export default function CagnotteDetail() {
             </button>
           </div>
         </div>
-        
+
         {/* Contenu de l'onglet */}
         <div className="mb-12">
           {activeTab === 'pourquoi' ? (
@@ -267,35 +317,35 @@ export default function CagnotteDetail() {
               <div className="relative mb-8 aspect-video bg-gray-800 rounded-lg overflow-hidden">
                 {/* Images et vidéo */}
                 <div className="relative w-full h-full">
-                  {mockCagnotte.images.map((image, index) => (
-                    <div 
-                      key={`image-${index}`} 
+                  {(currentCagnotte.images || []).map((image, index) => (
+                    <div
+                      key={`image-${index}`}
                       className={`absolute inset-0 transition-opacity duration-500 ${currentSlide === index ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                     >
-                      <Image 
-                        src={image} 
+                      <Image
+                        src={image}
                         alt={`Image ${index+1} de la cagnotte`}
                         fill
                         style={{ objectFit: 'cover' }}
                       />
                     </div>
                   ))}
-                  
-                  {mockCagnotte.video && (
-                    <div 
-                      className={`absolute inset-0 transition-opacity duration-500 ${currentSlide === mockCagnotte.images.length ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+
+                  {currentCagnotte.video && (
+                    <div
+                      className={`absolute inset-0 transition-opacity duration-500 ${currentSlide === (currentCagnotte.images?.length || 0) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                     >
                       {isVideoPlaying ? (
-                        <iframe 
+                        <iframe
                           ref={videoRef}
-                          src={`${mockCagnotte.video}?autoplay=1`}
+                          src={`${currentCagnotte.video}?autoplay=1`}
                           className="w-full h-full"
                           allowFullScreen
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         ></iframe>
                       ) : (
                         <div className="relative w-full h-full bg-gray-900 flex items-center justify-center">
-                          <button 
+                          <button
                             onClick={playVideo}
                             className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
                           >
@@ -309,21 +359,21 @@ export default function CagnotteDetail() {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Contrôles du slider */}
-                <button 
+                <button
                   className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white hover:bg-black/50 transition-colors"
                   onClick={goToPrevSlide}
                 >
                   <FaChevronLeft />
                 </button>
-                <button 
+                <button
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white hover:bg-black/50 transition-colors"
                   onClick={goToNextSlide}
                 >
                   <FaChevronRight />
                 </button>
-                
+
                 {/* Indicateurs */}
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
                   {Array.from({ length: slideCount }).map((_, index) => (
@@ -338,17 +388,19 @@ export default function CagnotteDetail() {
                   ))}
                 </div>
               </div>
-              
+
               {/* Description longue */}
               <div className="prose prose-lg max-w-none mb-8">
-                <p className="text-xl font-medium mb-4">{mockCagnotte.description}</p>
-                <div className="whitespace-pre-line">{mockCagnotte.longDescription}</div>
+                <p className="text-xl font-medium mb-4">{currentCagnotte.description}</p>
+                <div className="whitespace-pre-line">{currentCagnotte.longDescription || currentCagnotte.description}</div>
               </div>
-              
+
               {/* Réseaux sociaux et contact */}
               <div className="border-t border-gray-200 pt-6 mb-10">
                 <h3 className="text-xl font-semibold mb-4">Contacter l&apos;organisateur</h3>
                 <div className="flex flex-wrap gap-2 sm:gap-4">
+                  {/* Pour l'instant, utiliser les données fictives pour les réseaux sociaux */}
+                  {/* TODO: Ajouter les champs réseaux sociaux à la base de données */}
                   <a href={mockCagnotte.author.socials.facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm sm:text-base">
                     <FaFacebook /> <span className="hidden xs:inline">Facebook</span>
                   </a>
@@ -373,43 +425,49 @@ export default function CagnotteDetail() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <p className="text-gray-600 mb-1">Organisateur</p>
-                      <p className="font-medium">{mockCagnotte.author.name}</p>
+                      <p className="font-medium">{currentCagnotte.author?.name || 'Utilisateur'}</p>
                     </div>
                     <div>
                       <p className="text-gray-600 mb-1">Catégorie</p>
-                      <p className="font-medium">{mockCagnotte.category}</p>
+                      <p className="font-medium">{currentCagnotte.category}</p>
                     </div>
                     <div>
                       <p className="text-gray-600 mb-1">Date de création</p>
-                      <p className="font-medium">{formatDate(mockCagnotte.createdAt)}</p>
+                      <p className="font-medium">{formatDate(new Date(currentCagnotte.created_at || currentCagnotte.createdAt || Date.now()))}</p>
                     </div>
                     <div>
                       <p className="text-gray-600 mb-1">Statut</p>
-                      <p className="font-medium">{mockCagnotte.isEnded ? 'Clôturée' : 'En cours'}</p>
+                      <p className="font-medium">{(currentCagnotte as any).status === 'closed' || currentCagnotte.isEnded ? 'Clôturée' : 'En cours'}</p>
                     </div>
                   </div>
-                  
+
                   <div className="pt-4 border-t border-gray-200">
                     <p className="text-gray-600 mb-2">Progression</p>
                     <div className="mb-2">
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium">{formatAmount(mockCagnotte.currentAmount)}</span>
-                        <span className="text-gray-600">Objectif: {formatAmount(mockCagnotte.targetAmount)}</span>
+                        <span className="font-medium">{formatAmount(currentCagnotte.current_amount || currentCagnotte.currentAmount || 0)}</span>
+                        {(currentCagnotte.show_target !== false && (currentCagnotte.target_amount || currentCagnotte.targetAmount)) && (
+                          <span className="text-gray-600">Objectif: {formatAmount(currentCagnotte.target_amount || currentCagnotte.targetAmount)}</span>
+                        )}
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5">
-                        <div 
-                          className="bg-amber-500 h-2.5 rounded-full" 
-                          style={{ width: `${Math.min(100, (mockCagnotte.currentAmount / mockCagnotte.targetAmount) * 100)}%` }}
-                        ></div>
-                      </div>
+                      {(currentCagnotte.show_target !== false && (currentCagnotte.target_amount || currentCagnotte.targetAmount)) && (
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div
+                            className="bg-amber-500 h-2.5 rounded-full"
+                            style={{ width: `${Math.min(100, ((currentCagnotte.current_amount || currentCagnotte.currentAmount || 0) / (currentCagnotte.target_amount || currentCagnotte.targetAmount || 1)) * 100)}%` }}
+                          ></div>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-gray-600">
-                      <span className="font-medium">{((mockCagnotte.currentAmount / mockCagnotte.targetAmount) * 100).toFixed(0)}%</span> de l&apos;objectif atteint
-                    </p>
+                    {(currentCagnotte.show_target !== false && (currentCagnotte.target_amount || currentCagnotte.targetAmount)) && (
+                      <p className="text-gray-600">
+                        <span className="font-medium">{(((currentCagnotte.current_amount || currentCagnotte.currentAmount || 0) / (currentCagnotte.target_amount || currentCagnotte.targetAmount || 1)) * 100).toFixed(0)}%</span> de l&apos;objectif atteint
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
-              
+
               {/* Actualités de la cagnotte */}
               <h3 className="text-2xl font-bold mb-6">Actualités de la cagnotte</h3>
               <div className="space-y-8 mb-8">
@@ -417,16 +475,16 @@ export default function CagnotteDetail() {
                   <div key={actu.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
                       <p className="text-gray-500 text-sm">
-                        Posté le {actu.date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}, 
+                        Posté le {actu.date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })},
                         {actu.date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                       <h4 className="text-xl font-bold mt-1">{actu.titre}</h4>
                     </div>
-                    
+
                     <div className="p-6">
                       {actu.video && (
                         <div className="mb-6 aspect-video rounded-lg overflow-hidden">
-                          <iframe 
+                          <iframe
                             src={actu.video}
                             className="w-full h-full"
                             allowFullScreen
@@ -434,30 +492,30 @@ export default function CagnotteDetail() {
                           ></iframe>
                         </div>
                       )}
-                      
+
                       {actu.images && actu.images.length > 0 && (
                         <div className="mb-6 aspect-video relative rounded-lg overflow-hidden">
-                          <Image 
-                            src={actu.images[0]} 
+                          <Image
+                            src={actu.images[0]}
                             alt={actu.titre}
                             fill
                             style={{ objectFit: 'cover' }}
                           />
                         </div>
                       )}
-                      
+
                       <div className="prose prose-lg max-w-none mb-4 whitespace-pre-line">
                         {actu.contenu}
                       </div>
-                      
+
                       {actu.montantCollecte && (
                         <div className="mt-6 pt-4 border-t border-gray-200">
                           <p className="text-gray-700 mb-2">
                             <span className="font-medium">Montant collecté à cette date :</span> {formatAmount(actu.montantCollecte)}
                           </p>
                           <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-amber-500 h-2 rounded-full" 
+                            <div
+                              className="bg-amber-500 h-2 rounded-full"
                               style={{ width: `${Math.min(100, (actu.montantCollecte / mockCagnotte.targetAmount) * 100)}%` }}
                             ></div>
                           </div>
@@ -470,12 +528,12 @@ export default function CagnotteDetail() {
                   </div>
                 ))}
               </div>
-              
+
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-xl font-semibold mb-4">Comment les fonds seront utilisés</h3>
                 <p className="text-gray-700 mb-4">
-                  L&apos;intégralité des fonds collectés sera utilisée pour financer les soins médicaux des enfants 
-                  dans la région de Dakar. Notre association fonctionne entièrement grâce à des bénévoles, 
+                  L&apos;intégralité des fonds collectés sera utilisée pour financer les soins médicaux des enfants
+                  dans la région de Dakar. Notre association fonctionne entièrement grâce à des bénévoles,
                   ce qui nous permet de garantir que votre argent ira directement aux bénéficiaires.
                 </p>
                 <p className="text-gray-700">
@@ -490,24 +548,24 @@ export default function CagnotteDetail() {
             </div>
           )}
         </div>
-        
+
         {/* Section des dons */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">
-              {mockCagnotte.isEnded 
-                ? `Cagnotte clôturée avec ${mockCagnotte.participants} participants` 
-                : `Cagnotte en cours avec ${mockCagnotte.participants} participants`}
+              {currentCagnotte.status === 'closed' || currentCagnotte.isEnded
+                ? `Cagnotte clôturée avec ${currentCagnotte.participants || 0} participants`
+                : `Cagnotte en cours avec ${currentCagnotte.participants || 0} participants`}
             </h2>
-            <button 
+            <button
               className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
               onClick={() => setSortByAmount(!sortByAmount)}
             >
-              <FaSortAmountDown /> 
+              <FaSortAmountDown />
               {sortByAmount ? 'Montant' : 'Date'}
             </button>
           </div>
-          
+
           {/* Liste des dons */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             {visibleDonations.length > 0 ? (
@@ -537,10 +595,10 @@ export default function CagnotteDetail() {
             ) : (
               <p className="text-center text-gray-500">Aucun don pour le moment. Soyez le premier à contribuer !</p>
             )}
-            
+
             {!showAllDonations && mockCagnotte.donations.length > 5 && (
               <div className="mt-6 text-center">
-                <button 
+                <button
                   className="px-6 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors"
                   onClick={() => setShowAllDonations(true)}
                 >
@@ -550,54 +608,54 @@ export default function CagnotteDetail() {
             )}
           </div>
         </div>
-        
+
         {/* Section de partage */}
         <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
           <h3 className="text-lg sm:text-xl font-semibold mb-4 text-center">Mobilisez du monde ! Votre soutien passe aussi par le partage :</h3>
-          
+
           <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6">
-            <a 
-              href={`https://www.facebook.com/sharer/sharer.php?u=https://africagnotte.com/cagnotte/${cagnotteId}`} 
-              target="_blank" 
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=https://africagnotte.com/cagnotte/${cagnotteId}`}
+              target="_blank"
               rel="noopener noreferrer"
               className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-blue-700 transition-colors text-sm sm:text-base"
             >
               <FaFacebook className="text-xl" /> <span className="hidden xs:inline">Facebook</span>
             </a>
-            <a 
+            <a
               href={`https://twitter.com/intent/tweet?url=https://africagnotte.com/cagnotte/${cagnotteId}&text=${encodeURIComponent(`Soutenez la cagnotte: ${mockCagnotte.title}`)}`}
-              target="_blank" 
-              rel="noopener noreferrer" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-400 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-blue-500 transition-colors text-sm sm:text-base"
             >
               <FaTwitter className="text-xl" /> <span className="hidden xs:inline">Twitter</span>
             </a>
-            <a 
+            <a
               href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Soutenez la cagnotte: ${mockCagnotte.title} https://africagnotte.com/cagnotte/${cagnotteId}`)}`}
-              target="_blank" 
-              rel="noopener noreferrer" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-3 sm:px-4 py-2 sm:py-3 bg-green-500 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-green-600 transition-colors text-sm sm:text-base"
             >
               <FaWhatsapp className="text-xl" /> <span className="hidden xs:inline">WhatsApp</span>
             </a>
-            <a 
+            <a
               href={`sms:&body=${encodeURIComponent(`Soutenez la cagnotte: ${mockCagnotte.title} https://africagnotte.com/cagnotte/${cagnotteId}`)}`}
-              target="_blank" 
-              rel="noopener noreferrer" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-600 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-gray-700 transition-colors text-sm sm:text-base"
             >
               <FaSms className="text-xl" /> <span className="hidden xs:inline">SMS</span>
             </a>
           </div>
-          
+
           <div className="flex">
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={`https://africagnotte.com/cagnotte/${cagnotteId}`}
               readOnly
               className="flex-1 p-3 bg-gray-100 rounded-l-md focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
-            <button 
+            <button
               onClick={handleCopyLink}
               className="px-4 py-3 bg-amber-500 text-white rounded-r-md hover:bg-amber-600 transition-colors flex items-center gap-2"
             >
@@ -608,4 +666,4 @@ export default function CagnotteDetail() {
       </div>
     </main>
   );
-} 
+}

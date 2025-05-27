@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "cloudinary:test": "node scripts/test-cloudinary-config.js",
+    "cloudinary:verify": "node scripts/verify-preset-creation.js",
+    "cloudinary:create": "node scripts/create-cloudinary-preset.js"
   },
   "dependencies": {
     "@cloudinary/url-gen": "^1.21.0",

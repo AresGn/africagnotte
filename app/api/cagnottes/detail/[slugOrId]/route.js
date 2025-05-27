@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
+// Fonction utilitaire pour valider si une chaîne est un UUID valide
+function isValidUUID(str) {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
+
 export async function GET(request, { params }) {
-  const slugOrId = params.slugOrId;
+  const { slugOrId } = await params;
 
   if (!slugOrId) {
     return NextResponse.json({ error: 'Le slug ou l\'ID de la cagnotte est requis.' }, { status: 400 });
@@ -21,15 +27,21 @@ export async function GET(request, { params }) {
     if (resultByUrl.rows.length > 0) {
       cagnotte = resultByUrl.rows[0];
     } else {
-      // Si non trouvé par custom_url, essayer par ID (en s'assurant que c'est un UUID valide si vos ID sont des UUID)
-      // Pour simplifier, on suppose que si ce n'est pas une URL, c'est un ID.
-      // Une validation plus robuste de l'ID (ex: vérifier si c'est un UUID) pourrait être ajoutée ici.
-      const resultById = await client.query(
-        'SELECT id, user_id, title, custom_url, category, description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, current_amount, status, created_at, updated_at FROM cagnottes WHERE id = $1',
-        [slugOrId]
-      );
-      if (resultById.rows.length > 0) {
-        cagnotte = resultById.rows[0];
+      // Si non trouvé par custom_url, vérifier si c'est un UUID valide avant d'essayer par ID
+      if (isValidUUID(slugOrId)) {
+        const resultById = await client.query(
+          'SELECT id, user_id, title, custom_url, category, description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, current_amount, status, created_at, updated_at FROM cagnottes WHERE id = $1',
+          [slugOrId]
+        );
+        if (resultById.rows.length > 0) {
+          cagnotte = resultById.rows[0];
+        }
+      } else {
+        // Si ce n'est ni une URL personnalisée ni un UUID valide, retourner une erreur explicite
+        client.release();
+        return NextResponse.json({
+          error: 'Cagnotte introuvable. L\'identifiant fourni n\'est ni une URL personnalisée valide ni un ID valide.'
+        }, { status: 404 });
       }
     }
 
@@ -54,4 +66,4 @@ export async function GET(request, { params }) {
     console.error('Erreur lors de la récupération des détails de la cagnotte:', error);
     return NextResponse.json({ error: 'Erreur interne du serveur.' }, { status: 500 });
   }
-} 
+}
