@@ -38,7 +38,7 @@ export default function ModifierCagnotte() {
   const { user, isAuthenticated, isLoading: authIsLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const cagnotteId = params.id as string;
+  const cagnotteId = params?.id as string;
 
   // États du formulaire
   const [title, setTitle] = useState('');
