@@ -169,10 +169,10 @@ export default function MesCagnottesPage() {
                     <p className="text-xs text-gray-500 mb-3"><span className="font-semibold">Catégorie:</span> {cagnotte.category}</p>
                   )}
                   <div className="text-sm text-gray-600 mb-1">
-                    Objectif: {cagnotte.target_amount ? `${cagnotte.target_amount} €` : 'N/A'}
+                    Objectif: {cagnotte.target_amount ? `${cagnotte.target_amount}FCFA` : 'N/A'}
                   </div>
                   <div className="text-sm text-amber-600 font-semibold mb-4">
-                    Collecté: {cagnotte.current_amount ? `${cagnotte.current_amount} €` : '0 €'}
+                    Collecté: {cagnotte.current_amount ? `${cagnotte.current_amount}FCFA` : '0FCFA'}
                   </div>
 
                   {/* Boutons d'action */}

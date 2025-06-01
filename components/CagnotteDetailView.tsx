@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { FaChevronLeft, FaChevronRight, FaPlay, FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaPhone, FaSms, FaCopy, FaSortAmountDown } from 'react-icons/fa';
+import Link from 'next/link';
+import { FaChevronLeft, FaChevronRight, FaPlay, FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaPhone, FaSms, FaCopy, FaSortAmountDown, FaHeart, FaUsers, FaLock } from 'react-icons/fa';
 
 // Types pour les données de cagnotte
 export interface CagnotteAuthor {
@@ -156,6 +157,63 @@ export default function CagnotteDetailView({ cagnotte, cagnotteId }: CagnotteDet
             Participez en toute confiance<br />
             <span className="text-sm">Cette cagnotte a été contrôlée et vérifiée par les équipes de AfricaGnotte.</span>
           </p>
+        </div>
+
+        {/* Section de participation */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 max-w-md mx-auto">
+          <div className="text-center">
+            {/* Montant collecté */}
+            <div className="mb-4">
+              <div className="text-4xl font-bold text-gray-800 mb-1">
+                {formatAmount(currentAmount)}
+              </div>
+              {targetAmount && cagnotte.show_target && (
+                <div className="text-gray-600">
+                  collectés sur <span className="font-semibold">{formatAmount(targetAmount)}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Barre de progression */}
+            {targetAmount && cagnotte.show_target && (
+              <div className="mb-4">
+                <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                  <div
+                    className="bg-gradient-to-r from-lime-400 to-lime-500 h-3 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min((currentAmount / targetAmount) * 100, 100)}%`
+                    }}
+                  ></div>
+                </div>
+                <div className="text-sm text-gray-600">
+                  {Math.round((currentAmount / targetAmount) * 100)}% atteint avec{' '}
+                  <span className="font-semibold">{cagnotte.participants || donations.length} participants</span>
+                </div>
+              </div>
+            )}
+
+            {!targetAmount || !cagnotte.show_target ? (
+              <div className="mb-4 text-sm text-gray-600">
+                <FaUsers className="inline mr-2" />
+                {cagnotte.participants || donations.length} participants
+              </div>
+            ) : null}
+
+            {/* Bouton de participation */}
+            <Link
+              href={`/paiement/${cagnotteId}`}
+              className="w-full bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 mb-4"
+            >
+              <FaHeart className="text-lg" />
+              JE PARTICIPE
+            </Link>
+
+            {/* Sécurité */}
+            <div className="flex items-center justify-center text-sm text-gray-500">
+              <FaLock className="mr-2" />
+              Plateforme 100% sécurisée
+            </div>
+          </div>
         </div>
 
         {/* Onglets */}
