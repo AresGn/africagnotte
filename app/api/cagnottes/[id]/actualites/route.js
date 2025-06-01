@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 
 // GET - Récupérer les actualités d'une cagnotte
 export async function GET(request, { params }) {
-  const cagnotteId = params.id;
+  const cagnotteId = (await params).id;
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get('limit')) || 10;
   const offset = parseInt(searchParams.get('offset')) || 0;
@@ -84,7 +84,7 @@ export async function GET(request, { params }) {
 
 // POST - Créer une nouvelle actualité (propriétaire uniquement)
 export async function POST(request, { params }) {
-  const cagnotteId = params.id;
+  const cagnotteId = (await params).id;
   const headersList = request.headers;
   const userId = headersList.get('x-user-id');
 

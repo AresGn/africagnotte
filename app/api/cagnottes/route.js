@@ -44,6 +44,10 @@ export async function POST(request) {
       custom_url,
       category,
       description,
+      long_description,
+      author_name,
+      author_phone,
+      author_socials,
       images, // S'attendre à une chaîne JSON ici, comme avant
       video,
       is_private,
@@ -60,13 +64,17 @@ export async function POST(request) {
 
     const client = await pool.connect();
     const result = await client.query(
-      'INSERT INTO cagnottes (user_id, title, custom_url, category, description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *',
+      'INSERT INTO cagnottes (user_id, title, custom_url, category, description, long_description, author_name, author_phone, author_socials, images, video, is_private, show_target, target_amount, hide_amount, show_participants, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *',
       [
         userId,
         title,
         custom_url || null,
         category,
         description,
+        long_description || null,
+        author_name || null,
+        author_phone || null,
+        author_socials || null, // Déjà stringifié côté client
         images, // Doit être une chaîne JSON valide
         video || null,
         is_private || false,

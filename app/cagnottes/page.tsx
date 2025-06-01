@@ -131,9 +131,9 @@ export default function CagnottesPage() { // Nom du composant changé pour évit
                         ></div>
                       </div>
                       <div className="flex justify-between mt-1 text-sm">
-                        <span className="font-semibold">{cagnotte.current_amount} €</span>
+                        <span className="font-semibold">{cagnotte.current_amount}FCFA</span>
                         {cagnotte.show_target && cagnotte.target_amount && (
-                          <span className="text-gray-600">Objectif: {cagnotte.target_amount} €</span>
+                          <span className="text-gray-600">Objectif: {cagnotte.target_amount}FCFA</span>
                         )}
                       </div>
                     </div>

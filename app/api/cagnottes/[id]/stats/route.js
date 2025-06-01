@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 
 // GET - Récupérer les statistiques détaillées d'une cagnotte
 export async function GET(request, { params }) {
-  const cagnotteId = params.id;
+  const cagnotteId = (await params).id;
   const headersList = request.headers;
   const userId = headersList.get('x-user-id');
 
@@ -102,11 +102,11 @@ export async function GET(request, { params }) {
 
       // Statistiques des commentaires
       const commentStats = await client.query(
-        `SELECT 
+        `SELECT
           COUNT(*) as total_donations,
           COUNT(comment) as donations_with_comment,
-          ROUND((COUNT(comment)::float / COUNT(*)) * 100, 1) as comment_percentage
-         FROM cagnotte_donations 
+          ROUND((COUNT(comment)::float / COUNT(*))::numeric * 100, 1) as comment_percentage
+         FROM cagnotte_donations
          WHERE cagnotte_id = $1 AND payment_status = 'completed'`,
         [cagnotteId]
       );

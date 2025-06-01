@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 
 // GET - Récupérer les dons d'une cagnotte
 export async function GET(request, { params }) {
-  const cagnotteId = params.id;
+  const cagnotteId = (await params).id;
   const { searchParams } = new URL(request.url);
   const sortBy = searchParams.get('sortBy') || 'date'; // 'date' ou 'amount'
   const limit = parseInt(searchParams.get('limit')) || 50;
@@ -90,7 +90,7 @@ export async function GET(request, { params }) {
 
 // POST - Créer un nouveau don
 export async function POST(request, { params }) {
-  const cagnotteId = params.id;
+  const cagnotteId = (await params).id;
 
   if (!cagnotteId) {
     return NextResponse.json({ error: 'ID de la cagnotte requis.' }, { status: 400 });

@@ -26,6 +26,14 @@ export default function CreerCagnotte() {
   const [hideAmount, setHideAmount] = useState(false);
   const [showParticipants, setShowParticipants] = useState(true);
   const [description, setDescription] = useState('Quel que soit le montant, chacun peut participer à cette cagnotte. Pas besoin de créer un compte ou de s&apos;inscrire, c&apos;est rapide et les paiements par Carte Bancaire sont 100% sécurisés.\n\nSi vous ne pouvez pas participer financièrement, partagez cette cagnotte autour de vous au maximum. MERCI !');
+  const [longDescription, setLongDescription] = useState('');
+  const [authorName, setAuthorName] = useState('');
+  const [authorPhone, setAuthorPhone] = useState('');
+  const [authorSocials, setAuthorSocials] = useState({
+    facebook: '',
+    twitter: '',
+    instagram: ''
+  });
   const [images, setImages] = useState<string[]>([]);
   const [video, setVideo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -74,6 +82,11 @@ export default function CreerCagnotte() {
         custom_url: customUrl || null,
         category,
         description,
+        long_description: longDescription || null,
+        author_name: authorName || null,
+        author_phone: authorPhone || null,
+        author_socials: (authorSocials.facebook || authorSocials.twitter || authorSocials.instagram)
+          ? JSON.stringify(authorSocials) : null,
         images: JSON.stringify(images),
         video: video || null,
         is_private: isPrivate,
@@ -273,13 +286,91 @@ export default function CreerCagnotte() {
                 <FaVideo className="text-xs sm:text-sm" />
               </button>
             </div>
-            <textarea 
-              id="description" 
+            <textarea
+              id="description"
               className="w-full p-2 sm:p-3 bg-gray-100 rounded-md min-h-[150px] sm:min-h-[200px] focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
             ></textarea>
+          </div>
+
+          <div className="mb-5 sm:mb-6">
+            <label htmlFor="long-description" className="block text-base sm:text-lg font-semibold mb-2">Description détaillée (optionnel)</label>
+            <textarea
+              id="long-description"
+              placeholder="Ajoutez plus de détails sur votre cagnotte, l'histoire derrière, les objectifs spécifiques..."
+              className="w-full p-2 sm:p-3 bg-gray-100 rounded-md min-h-[120px] focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+              value={longDescription}
+              onChange={(e) => setLongDescription(e.target.value)}
+            ></textarea>
+          </div>
+
+          <div className="mb-5 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-3">Informations de contact (optionnel)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="author-name" className="block text-sm font-medium mb-2">Nom de l'organisateur</label>
+                <input
+                  type="text"
+                  id="author-name"
+                  placeholder="Votre nom complet"
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                  value={authorName}
+                  onChange={(e) => setAuthorName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="author-phone" className="block text-sm font-medium mb-2">Téléphone de contact</label>
+                <input
+                  type="tel"
+                  id="author-phone"
+                  placeholder="+33 6 12 34 56 78"
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                  value={authorPhone}
+                  onChange={(e) => setAuthorPhone(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-5 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-3">Réseaux sociaux (optionnel)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label htmlFor="facebook" className="block text-sm font-medium mb-2">Facebook</label>
+                <input
+                  type="url"
+                  id="facebook"
+                  placeholder="https://facebook.com/votre-profil"
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                  value={authorSocials.facebook}
+                  onChange={(e) => setAuthorSocials({...authorSocials, facebook: e.target.value})}
+                />
+              </div>
+              <div>
+                <label htmlFor="twitter" className="block text-sm font-medium mb-2">Twitter</label>
+                <input
+                  type="url"
+                  id="twitter"
+                  placeholder="https://twitter.com/votre-profil"
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                  value={authorSocials.twitter}
+                  onChange={(e) => setAuthorSocials({...authorSocials, twitter: e.target.value})}
+                />
+              </div>
+              <div>
+                <label htmlFor="instagram" className="block text-sm font-medium mb-2">Instagram</label>
+                <input
+                  type="url"
+                  id="instagram"
+                  placeholder="https://instagram.com/votre-profil"
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                  value={authorSocials.instagram}
+                  onChange={(e) => setAuthorSocials({...authorSocials, instagram: e.target.value})}
+                />
+              </div>
+            </div>
           </div>
           
           <div className="text-center">

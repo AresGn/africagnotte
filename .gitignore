@@ -42,3 +42,13 @@ next-env.d.ts
 
 # supabase test file
 supabase-test.http
+
+# project-specific additions
+*.sql
+
+# Ignore all Markdown files...
+*.md
+# ...but keep README.md
+!README.md
+
+*.http
