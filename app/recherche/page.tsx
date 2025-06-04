@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaSearch, FaFilter, FaUsers, FaCalendarAlt } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 
 // Utilisation des mêmes catégories que sur la page d'accueil
 const categories = [
@@ -13,96 +14,65 @@ const categories = [
   { name: 'Urgences', emoji: '🚨' }
 ];
 
-// Données fictives pour les cagnottes (dans un vrai projet, ces données viendraient d'une API/base de données)
-// Using valid UUIDs for consistency with database schema
-const mockCagnottes = [
-  {
-    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-    title: 'Soutien médical pour les enfants',
-    description: 'Aidez-nous à financer des soins médicaux pour les enfants malades dans la région de Dakar.',
-    imageUrl: '/images/campaign-1.webp',
-    category: 'Santé',
-    createdAt: new Date('2023-09-15'),
-    currentAmount: 7000000,
-    targetAmount: 10000000,
-    participants: 123,
-    author: 'Association Santé Pour Tous'
-  },
-  {
-    id: 'b2c3d4e5-f6g7-8901-bcde-f23456789012',
-    title: 'Reconstruction après les inondations',
-    description: 'Soutenez les familles qui ont tout perdu lors des récentes inondations.',
-    imageUrl: '/images/campaign-2.jpg',
-    category: 'Urgences',
-    createdAt: new Date('2023-08-22'),
-    currentAmount: 3500000,
-    targetAmount: 5000000,
-    participants: 78,
-    author: 'Solidarité Afrique'
-  },
-  {
-    id: 'c3d4e5f6-g7h8-9012-cdef-345678901234',
-    title: 'Éducation pour orphelins',
-    description: 'Aidez-nous à offrir une éducation de qualité aux orphelins de notre communauté.',
-    imageUrl: '/images/campaign-3.jpeg',
-    category: 'Orphelins',
-    createdAt: new Date('2023-10-05'),
-    currentAmount: 2000000,
-    targetAmount: 4000000,
-    participants: 45,
-    author: 'Centre Espoir'
-  },
-  {
-    id: 'd4e5f6g7-h8i9-0123-def4-56789012345a',
-    title: 'Aide alimentaire pour familles en difficulté',
-    description: 'Soutenez notre initiative pour fournir des repas aux familles en situation précaire.',
-    imageUrl: '/images/campaign-1.webp',
-    category: 'Famille',
-    createdAt: new Date('2023-07-10'),
-    currentAmount: 1500000,
-    targetAmount: 3000000,
-    participants: 62,
-    author: 'Association Solidarité'
-  },
-  {
-    id: 'e5f6g7h8-i9j0-1234-efg5-6789012345ab',
-    title: 'Équipement médical pour dispensaire rural',
-    description: 'Aidez-nous à équiper un dispensaire dans une zone rurale pour améliorer l\'accès aux soins.',
-    imageUrl: '/images/campaign-2.jpg',
-    category: 'Santé',
-    createdAt: new Date('2023-06-28'),
-    currentAmount: 4200000,
-    targetAmount: 6000000,
-    participants: 89,
-    author: 'Médecins Sans Frontières'
-  },
-  {
-    id: 'f6g7h8i9-j0k1-2345-fgh6-789012345abc',
-    title: 'Soutien aux victimes d\'incendie',
-    description: 'Aidez les familles touchées par l\'incendie qui a ravagé leur quartier.',
-    imageUrl: '/images/campaign-3.jpeg',
-    category: 'Urgences',
-    createdAt: new Date('2023-11-01'),
-    currentAmount: 900000,
-    targetAmount: 2500000,
-    participants: 35,
-    author: 'Urgence Afrique'
-  }
-];
+// Interface pour les cagnottes
+interface Cagnotte {
+  id: string;
+  title: string;
+  custom_url: string | null;
+  category: string;
+  description: string;
+  images: string[];
+  current_amount: number;
+  target_amount: number | null;
+  participants_count: number;
+  author_name: string | null;
+  created_at: string;
+}
 
 export default function RechercheCagnotte() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  const [allCagnottes, setAllCagnottes] = useState<Cagnotte[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const itemsPerPage = 4;
 
+  // Charger toutes les cagnottes publiques au montage du composant
+  useEffect(() => {
+    async function fetchCagnottes() {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch('/api/cagnottes/public');
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Impossible de charger les cagnottes');
+        }
+
+        const data: Cagnotte[] = await response.json();
+        setAllCagnottes(data);
+
+      } catch (err) {
+        console.error('Erreur lors du chargement des cagnottes:', err);
+        setError((err as Error).message || 'Impossible de charger les cagnottes');
+        toast.error((err as Error).message || 'Erreur lors du chargement des cagnottes');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCagnottes();
+  }, []);
+
   // Filtrage des cagnottes en fonction des critères de recherche
-  const filteredCagnottes = mockCagnottes.filter(cagnotte => {
+  const filteredCagnottes = allCagnottes.filter(cagnotte => {
     const matchesSearch = cagnotte.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          cagnotte.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         cagnotte.author.toLowerCase().includes(searchQuery.toLowerCase());
+                         (cagnotte.author_name && cagnotte.author_name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesCategory = selectedCategories.length === 0 ||
                           selectedCategories.includes(cagnotte.category);
@@ -118,7 +88,8 @@ export default function RechercheCagnotte() {
   );
 
   // Formatage des dates et montants
-  const formatDate = (date: Date) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
@@ -255,7 +226,23 @@ export default function RechercheCagnotte() {
 
           {/* Liste des cagnottes */}
           <div className="lg:col-span-3">
-            {displayedCagnottes.length === 0 ? (
+            {loading ? (
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 text-center">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Chargement...</h3>
+                <p className="text-gray-600">Récupération des cagnottes en cours...</p>
+              </div>
+            ) : error ? (
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 text-center">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-red-600">Erreur</h3>
+                <p className="text-gray-600 mb-3 sm:mb-4">{error}</p>
+                <button
+                  className="text-amber-600 hover:text-amber-700 font-medium"
+                  onClick={() => window.location.reload()}
+                >
+                  Réessayer
+                </button>
+              </div>
+            ) : displayedCagnottes.length === 0 ? (
               <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 text-center">
                 <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Aucune cagnotte trouvée</h3>
                 <p className="text-gray-600 mb-3 sm:mb-4">Essayez d&apos;autres termes de recherche ou de modifier vos filtres.</p>
@@ -275,7 +262,7 @@ export default function RechercheCagnotte() {
                     <div className="grid grid-cols-1 md:grid-cols-3">
                       <div className="relative h-48 sm:h-60 md:h-full">
                         <Image
-                          src={cagnotte.imageUrl}
+                          src={cagnotte.images[0] || '/images/default-campaign.jpg'}
                           alt={cagnotte.title}
                           fill
                           style={{ objectFit: 'cover' }}
@@ -286,7 +273,7 @@ export default function RechercheCagnotte() {
                           <div>
                             <h3 className="text-base sm:text-xl font-bold mb-1 sm:mb-2">{cagnotte.title}</h3>
                             <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3">
-                              Par <span className="font-medium">{cagnotte.author}</span>
+                              Par <span className="font-medium">{cagnotte.author_name || 'Anonyme'}</span>
                             </p>
                           </div>
                           <span className="inline-block px-2 sm:px-3 py-1 bg-amber-100 text-amber-800 text-xs sm:text-sm font-medium rounded-full">
@@ -302,31 +289,31 @@ export default function RechercheCagnotte() {
                               <p className="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
                                 <FaCalendarAlt className="text-gray-400" /> Créée le
                               </p>
-                              <p className="text-sm sm:text-base font-medium">{formatDate(cagnotte.createdAt)}</p>
+                              <p className="text-sm sm:text-base font-medium">{formatDate(cagnotte.created_at)}</p>
                             </div>
                             <div>
                               <p className="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
                                 <FaUsers className="text-gray-400" /> Participants
                               </p>
-                              <p className="text-sm sm:text-base font-medium">{cagnotte.participants} personnes</p>
+                              <p className="text-sm sm:text-base font-medium">{cagnotte.participants_count} personnes</p>
                             </div>
                           </div>
 
                           <div className="mb-3">
                             <div className="flex justify-between text-xs sm:text-sm mb-1">
-                              <span className="font-medium">{formatAmount(cagnotte.currentAmount)}</span>
-                              <span className="text-gray-600">Objectif: {formatAmount(cagnotte.targetAmount)}</span>
+                              <span className="font-medium">{formatAmount(cagnotte.current_amount)}</span>
+                              <span className="text-gray-600">Objectif: {formatAmount(cagnotte.target_amount || 0)}</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5">
                               <div
                                 className="bg-amber-500 h-2 sm:h-2.5 rounded-full"
-                                style={{ width: `${Math.min(100, (cagnotte.currentAmount / cagnotte.targetAmount) * 100)}%` }}
+                                style={{ width: `${Math.min(100, cagnotte.target_amount ? (cagnotte.current_amount / cagnotte.target_amount) * 100 : 0)}%` }}
                               ></div>
                             </div>
                           </div>
 
                           <Link
-                            href={`/c/${cagnotte.id}`}
+                            href={cagnotte.custom_url ? `/c/${cagnotte.custom_url}` : `/c/${cagnotte.id}`}
                             className="block text-center w-full py-2 px-4 bg-amber-500 hover:bg-amber-600 text-white rounded-md font-medium transition-colors text-sm sm:text-base"
                           >
                             Voir la cagnotte
