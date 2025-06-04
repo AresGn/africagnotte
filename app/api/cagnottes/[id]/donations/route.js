@@ -29,14 +29,15 @@ export async function GET(request, { params }) {
 
     const cagnotte = cagnotteResult.rows[0];
 
-    // Si la cagnotte est privée, vérifier l'authentification
+    // Si la cagnotte est privée, vérifier l'authentification (seulement pour les utilisateurs connectés)
     if (cagnotte.is_private) {
       const headersList = request.headers;
       const userId = headersList.get('x-user-id');
 
+      // Pour les cagnottes privées, l'utilisateur doit être connecté et être le propriétaire
       if (!userId || userId !== cagnotte.user_id) {
         client.release();
-        return NextResponse.json({ error: 'Accès non autorisé.' }, { status: 403 });
+        return NextResponse.json({ error: 'Accès non autorisé à cette cagnotte privée.' }, { status: 403 });
       }
     }
 

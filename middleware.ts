@@ -11,14 +11,13 @@ import { jwtVerify, errors as JoseErrors } from 'jose'; // Import de jwtVerify e
 // Ou des routes spécifiques :
 // const protectedPaths = ['/dashboard', '/profile'];
 
-// Pour l'instant, nous allons créer une route de test /api/me
-// et le matcher la ciblera pour la démonstration.
+// Configuration des routes à vérifier par le middleware
 export const config = {
   matcher: [
     '/api/me/:path*',
-    '/api/cagnottes/:path*',
-    '/api/profile/:path*'
-  ], // Protège /api/me, /api/cagnottes (y compris les nouvelles routes [id]) et /api/profile
+    '/api/profile/:path*',
+    '/api/cagnottes/:path*', // On vérifie toutes les routes cagnottes, mais on exclut les publiques dans le middleware
+  ],
 };
 
 async function getKey(secret: string) {
@@ -27,6 +26,25 @@ async function getKey(secret: string) {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Routes publiques qui ne nécessitent pas d'authentification
+  const publicRoutes = [
+    '/api/cagnottes/public',
+    '/api/cagnottes/featured',
+    '/api/cagnottes/detail',
+  ];
+
+  // Vérifier si la route est publique
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+
+  // Pour les routes de donations et actualités, seul GET est public
+  const isDonationsOrActualitesGet = (pathname.includes('/donations') || pathname.includes('/actualites')) && request.method === 'GET';
+
+  if (isPublicRoute || isDonationsOrActualitesGet) {
+    console.log(`[Middleware] Public route accessed: ${pathname}`);
+    return NextResponse.next();
+  }
+
   const jwtSecretString = process.env.JWT_SECRET;
 
   if (!jwtSecretString) {

@@ -46,6 +46,20 @@ export async function GET(request, { params }) {
     }
 
     if (cagnotte) {
+      // Vérifier l'accès aux cagnottes privées
+      if (cagnotte.is_private) {
+        const headersList = request.headers;
+        const userId = headersList.get('x-user-id');
+
+        // Seul le propriétaire peut voir une cagnotte privée
+        if (!userId || userId !== cagnotte.user_id) {
+          client.release();
+          return NextResponse.json({
+            error: 'Cette cagnotte est privée et n\'est pas accessible.'
+          }, { status: 403 });
+        }
+      }
+
       // Récupérer les dons récents (5 derniers)
       const donationsResult = await client.query(
         `SELECT id, donor_name, amount, comment, is_anonymous, created_at

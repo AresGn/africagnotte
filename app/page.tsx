@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Footer from './components/Footer';
@@ -5,40 +8,53 @@ import CampaignCard from './components/CampaignCard';
 import HeroSection from './components/HeroSection';
 import { AnimatedTestimonialsDemo } from './components/ui/animated-testimonials-demo';
 import { CategoryTabsDemo } from './components/ui/category-tabs-demo';
+import { toast } from 'react-hot-toast';
 
-// Sample data - in a real app, this would come from an API/database
-// Using valid UUIDs for consistency with database schema
-const campaigns = [
-  {
-    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-    imageUrl: '/images/campaign-1.webp',
-    title: 'Soutien médical pour les enfants',
-    description: 'Aidez-nous à financer des soins médicaux pour les enfants malades dans la région de Dakar.',
-    category: 'Santé',
-    currentAmount: 7000000,
-    targetAmount: 10000000
-  },
-  {
-    id: 'b2c3d4e5-f6g7-8901-bcde-f23456789012',
-    imageUrl: '/images/campaign-2.jpg',
-    title: 'Reconstruction après les inondations',
-    description: 'Soutenez les familles qui ont tout perdu lors des récentes inondations.',
-    category: 'Urgences',
-    currentAmount: 3500000,
-    targetAmount: 5000000
-  },
-  {
-    id: 'c3d4e5f6-g7h8-9012-cdef-345678901234',
-    imageUrl: '/images/campaign-3.jpeg',
-    title: 'Éducation pour orphelins',
-    description: 'Aidez-nous à offrir une éducation de qualité aux orphelins de notre communauté.',
-    category: 'Orphelins',
-    currentAmount: 2000000,
-    targetAmount: 4000000
-  }
-];
+// Interface pour les cagnottes
+interface Campaign {
+  id: string;
+  title: string;
+  custom_url: string | null;
+  category: string;
+  description: string;
+  images: string[];
+  current_amount: number;
+  target_amount: number | null;
+  show_target: boolean;
+}
 
 export default function Home() {
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchFeaturedCampaigns() {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch('/api/cagnottes/featured');
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Impossible de charger les cagnottes en vedette');
+        }
+
+        const data: Campaign[] = await response.json();
+        setCampaigns(data);
+
+      } catch (err) {
+        console.error('Erreur lors du chargement des cagnottes en vedette:', err);
+        setError((err as Error).message || 'Impossible de charger les cagnottes en vedette');
+        toast.error((err as Error).message || 'Erreur lors du chargement des cagnottes en vedette');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFeaturedCampaigns();
+  }, []);
+
   return (
     <main className="min-h-screen pt-16">
       <Navbar />
@@ -63,20 +79,45 @@ export default function Home() {
             Cagnottes à la une
           </h2>
           <p className="text-center mb-10">Découvrez des causes qui ont besoin de votre soutien</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {campaigns.map((campaign) => (
-              <CampaignCard
-                key={campaign.id}
-                id={campaign.id}
-                imageUrl={campaign.imageUrl}
-                title={campaign.title}
-                description={campaign.description}
-                category={campaign.category}
-                currentAmount={campaign.currentAmount}
-                targetAmount={campaign.targetAmount}
-              />
-            ))}
-          </div>
+
+          {loading ? (
+            <div className="text-center py-10">
+              <p className="text-lg">Chargement des cagnottes en vedette...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-10">
+              <p className="text-red-600 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="btn-secondary"
+              >
+                Réessayer
+              </button>
+            </div>
+          ) : campaigns.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-xl mb-4">Aucune cagnotte en vedette pour le moment</p>
+              <Link href="/creer" className="btn-secondary">
+                Créer la première cagnotte
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {campaigns.map((campaign) => (
+                <CampaignCard
+                  key={campaign.id}
+                  id={campaign.id}
+                  imageUrl={campaign.images[0] || '/images/default-campaign.jpg'}
+                  title={campaign.title}
+                  description={campaign.description}
+                  category={campaign.category}
+                  currentAmount={campaign.current_amount}
+                  targetAmount={campaign.target_amount || 0}
+                />
+              ))}
+            </div>
+          )}
+
           <div className="text-center mt-10">
             <Link href="/cagnottes" className="btn-secondary">
               Voir toutes les cagnottes
