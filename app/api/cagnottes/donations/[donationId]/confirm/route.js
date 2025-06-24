@@ -13,8 +13,8 @@ export async function PUT(request, { params }) {
     const body = await request.json();
     const {
       payment_status, // 'completed', 'failed', 'refunded'
-      payment_reference,
-      webhook_signature // Pour vérifier l'authenticité du webhook
+      payment_reference
+      // webhook_signature // Pour vérifier l'authenticité du webhook
     } = body;
 
     // TODO: Vérifier la signature du webhook selon votre système de paiement
@@ -41,7 +41,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Don introuvable.' }, { status: 404 });
     }
 
-    const donation = donationResult.rows[0];
+    // const donation = donationResult.rows[0];
 
     // Mettre à jour le statut du don
     const updateResult = await client.query(

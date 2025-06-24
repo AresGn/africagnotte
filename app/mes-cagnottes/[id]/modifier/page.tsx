@@ -284,7 +284,7 @@ export default function ModifierCagnotte() {
           </div>
 
           <div className="mb-5 sm:mb-6">
-            <label className="block text-base sm:text-lg font-semibold mb-3">Options de confidentialité et d'affichage</label>
+            <label className="block text-base sm:text-lg font-semibold mb-3">Options de confidentialité et d&apos;affichage</label>
             <div className="space-y-3">
               <label className="flex items-center">
                 <input
@@ -303,7 +303,7 @@ export default function ModifierCagnotte() {
                   onChange={(e) => setShowTarget(e.target.checked)}
                   className="mr-2 h-4 w-4 text-amber-500 focus:ring-amber-500 border-gray-300 rounded"
                 />
-                <span className="text-sm sm:text-base">Afficher l'objectif de collecte</span>
+                <span className="text-sm sm:text-base">Afficher l&apos;objectif de collecte</span>
               </label>
 
               {showTarget && (

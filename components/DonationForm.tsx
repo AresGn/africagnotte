@@ -163,7 +163,7 @@ export default function DonationForm({ cagnotteId, onDonationSuccess }: Donation
 
       <div className="mt-4 text-center">
         <p className="text-xs text-gray-500">
-          En cliquant sur "Faire un don", vous acceptez nos conditions d'utilisation.
+          En cliquant sur &quot;Faire un don&quot;, vous acceptez nos conditions d&apos;utilisation.
           <br />
           Votre don sera traité de manière sécurisée.
         </p>

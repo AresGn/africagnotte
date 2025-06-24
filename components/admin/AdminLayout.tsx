@@ -16,7 +16,7 @@ import {
   FiSettings
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
-import { useAdminAuth, UserRole, AdminUser, hasRequiredRole } from '../../hooks/useAdminAuth';
+import { useAdminAuth, UserRole, hasRequiredRole } from '../../hooks/useAdminAuth';
 
 interface AdminLayoutProps {
   children: React.ReactNode;

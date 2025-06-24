@@ -20,7 +20,7 @@ export default function PaymentProgress({ currentStep }: PaymentProgressProps) {
           const Icon = step.icon;
           const isCompleted = currentStep > step.id;
           const isCurrent = currentStep === step.id;
-          const isUpcoming = currentStep < step.id;
+          // const isUpcoming = currentStep < step.id;
 
           return (
             <div key={step.id} className="flex items-center">

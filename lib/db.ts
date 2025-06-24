@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 
-let pool;
+let pool: Pool | undefined;
 
 if (!pool) {
   pool = new Pool({
@@ -13,4 +13,4 @@ if (!pool) {
   });
 }
 
-export default pool;
+export default pool as Pool;

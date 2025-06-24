@@ -106,7 +106,7 @@ export default function PaymentSuccess({
           </div>
           <p className="text-sm text-gray-600">
             Un email de confirmation vous a été envoyé. 
-            Vous pouvez suivre l'évolution de la cagnotte à tout moment.
+            Vous pouvez suivre l&apos;évolution de la cagnotte à tout moment.
           </p>
         </div>
 
@@ -114,7 +114,7 @@ export default function PaymentSuccess({
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-3 flex items-center justify-center">
             <FaShare className="mr-2" />
-            Partagez pour amplifier l'impact
+            Partagez pour amplifier l&apos;impact
           </h3>
           <div className="flex justify-center space-x-3">
             <a
@@ -156,7 +156,7 @@ export default function PaymentSuccess({
             href="/cagnottes"
             className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors block"
           >
-            Découvrir d'autres cagnottes
+            Découvrir d&apos;autres cagnottes
           </Link>
         </div>
 

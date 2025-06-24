@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import { toast, Toaster } from 'react-hot-toast';
 import Link from 'next/link';
+import Image from 'next/image';
 import ConfirmDeleteModal from '../../components/ConfirmDeleteModal';
 
 interface Cagnotte {
@@ -141,9 +142,11 @@ export default function MesCagnottesPage() {
             {cagnottes.map((cagnotte) => (
               <div key={cagnotte.id} className="bg-white shadow-md rounded-lg overflow-hidden">
                 {cagnotte.images && (
-                  <img
+                  <Image
                     src={Array.isArray(cagnotte.images) ? cagnotte.images[0] : cagnotte.images}
                     alt={cagnotte.title}
+                    width={400}
+                    height={192}
                     className="w-full h-48 object-cover"
                   />
                 )}

@@ -56,17 +56,7 @@ interface Activity {
   color: string;
 }
 
-interface StatCard {
-  title: string;
-  value: number;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  bgColor: string;
-  change?: string;
-  changeType?: 'positive' | 'negative';
-  urgent?: boolean;
-  suffix?: string;
-}
+// Interface supprimée car non utilisée - remplacée par des objets inline
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -77,7 +67,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchAllData();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchAllData = async () => {
     await Promise.all([
@@ -212,7 +202,8 @@ export default function AdminDashboard() {
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
       change: '+12%',
-      changeType: 'positive'
+      changeType: 'positive' as const,
+      suffix: ''
     },
     {
       title: 'En Attente',
@@ -220,7 +211,8 @@ export default function AdminDashboard() {
       icon: FiClock,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-50',
-      urgent: stats.pending_cagnottes > 3
+      urgent: stats.pending_cagnottes > 3,
+      suffix: ''
     },
     {
       title: 'Approuvées',
@@ -229,14 +221,16 @@ export default function AdminDashboard() {
       color: 'text-green-600',
       bgColor: 'bg-green-50',
       change: '+8%',
-      changeType: 'positive'
+      changeType: 'positive' as const,
+      suffix: ''
     },
     {
       title: 'Rejetées',
       value: stats.rejected_cagnottes,
       icon: FiXCircle,
       color: 'text-red-600',
-      bgColor: 'bg-red-50'
+      bgColor: 'bg-red-50',
+      suffix: ''
     }
   ];
 
@@ -247,17 +241,19 @@ export default function AdminDashboard() {
       icon: FiAlertTriangle,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
-      urgent: stats.pending_reports > 2
+      urgent: stats.pending_reports > 2,
+      suffix: ''
     },
     {
       title: 'Total Signalements',
       value: stats.total_reports,
       icon: FiAlertTriangle,
       color: 'text-orange-500',
-      bgColor: 'bg-orange-25'
+      bgColor: 'bg-orange-25',
+      suffix: ''
     },
     {
-      title: 'Taux d\'Approbation',
+      title: 'Taux d&apos;Approbation',
       value: Math.round((stats.approved_cagnottes / stats.total_cagnottes) * 100),
       icon: FiTrendingUp,
       color: 'text-indigo-600',
@@ -274,14 +270,16 @@ export default function AdminDashboard() {
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
       change: '+5%',
-      changeType: 'positive'
+      changeType: 'positive' as const,
+      suffix: ''
     },
     {
       title: 'Suspendues',
       value: stats.suspended_cagnottes,
       icon: FiDollarSign,
       color: 'text-gray-600',
-      bgColor: 'bg-gray-50'
+      bgColor: 'bg-gray-50',
+      suffix: ''
     }
   ];
 
@@ -294,7 +292,7 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold flex items-center">
               🛡️ Dashboard Administrateur
             </h1>
-            <p className="text-amber-100 mt-2">Vue d'ensemble et gestion de la plateforme AfriCagnotte</p>
+            <p className="text-amber-100 mt-2">Vue d&apos;ensemble et gestion de la plateforme AfriCagnotte</p>
           </div>
           <button
             onClick={fetchAllData}
@@ -436,7 +434,7 @@ export default function AdminDashboard() {
             {/* Taux d'approbation */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">Taux d'Approbation</span>
+                <span className="text-sm font-medium text-gray-700">Taux d&apos;Approbation</span>
                 <span className="text-sm font-bold text-green-600">
                   {Math.round((stats.approved_cagnottes / stats.total_cagnottes) * 100)}%
                 </span>
@@ -684,7 +682,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <FiTrendingUp className="h-5 w-5 mr-2 text-indigo-500" />
-            Aujourd'hui
+            Aujourd&apos;hui
           </h3>
           {dailyStats ? (
             <div className="space-y-4">

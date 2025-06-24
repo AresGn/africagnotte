@@ -45,7 +45,7 @@ export default function ConfirmDeleteModal({
                 Êtes-vous sûr de vouloir supprimer la cagnotte
               </p>
               <p className="text-sm font-semibold text-gray-900 mt-1">
-                "{title}" ?
+                &quot;{title}&quot; ?
               </p>
             </div>
           </div>
