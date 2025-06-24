@@ -138,11 +138,16 @@ export default function LoginForm() {
         </div>
       </form>
       
-      <div className="mt-6 text-center text-sm">
+      <div className="mt-6 text-center text-sm space-y-2">
         <p>
           Vous n&apos;avez pas de compte?{' '}
           <a href="/inscription" className="font-medium hover:opacity-80" style={{ color: 'var(--primary-color)' }}>
             Inscrivez-vous
+          </a>
+        </p>
+        <p>
+          <a href="/admin/connexion" className="text-amber-600 hover:text-amber-700 font-medium text-xs">
+            🛡️ Connexion Administrateur
           </a>
         </p>
       </div>

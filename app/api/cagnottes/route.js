@@ -112,24 +112,24 @@ export async function POST(request) {
 }
 
 // Fonction utilitaire pour valider les données de cagnotte
-function validateCagnotteData(data) {
-  const errors = [];
+// function validateCagnotteData(data) {
+//   const errors = [];
 
-  if (!data.title || data.title.trim().length === 0) {
-    errors.push('Le titre est requis');
-  }
-  if (data.title && data.title.length > 50) {
-    errors.push('Le titre ne peut pas dépasser 50 caractères');
-  }
-  if (!data.category || data.category.trim().length === 0) {
-    errors.push('La catégorie est requise');
-  }
-  if (!data.description || data.description.trim().length === 0) {
-    errors.push('La description est requise');
-  }
-  if (data.show_target && (!data.target_amount || data.target_amount <= 0)) {
-    errors.push('Le montant cible doit être supérieur à 0 quand l\'affichage de l\'objectif est activé');
-  }
+//   if (!data.title || data.title.trim().length === 0) {
+//     errors.push('Le titre est requis');
+//   }
+//   if (data.title && data.title.length > 50) {
+//     errors.push('Le titre ne peut pas dépasser 50 caractères');
+//   }
+//   if (!data.category || data.category.trim().length === 0) {
+//     errors.push('La catégorie est requise');
+//   }
+//   if (!data.description || data.description.trim().length === 0) {
+//     errors.push('La description est requise');
+//   }
+//   if (data.show_target && (!data.target_amount || data.target_amount <= 0)) {
+//     errors.push('Le montant cible doit être supérieur à 0 quand l\'affichage de l\'objectif est activé');
+//   }
 
-  return errors;
-}
+//   return errors;
+// }

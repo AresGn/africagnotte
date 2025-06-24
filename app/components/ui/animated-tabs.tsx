@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "../../lib/utils";
+import Image from "next/image";
 
 interface Tab {
 id: string;
@@ -22,9 +23,11 @@ const defaultTabs: Tab[] = [
   label: "Tab 1",
   content: (
     <div className="grid grid-cols-2 gap-4 w-full h-full">
-      <img
+      <Image
         src="https://images.unsplash.com/photo-1493552152660-f915ab47ae9d?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         alt="Tab 1"
+        width={400}
+        height={240}
         className="rounded-lg w-full h-60 object-cover mt-0 !m-0 shadow-md border-none"
       />
 
@@ -45,9 +48,11 @@ const defaultTabs: Tab[] = [
   label: "Tab 2",
   content: (
     <div className="grid grid-cols-2 gap-4 w-full h-full">
-      <img
+      <Image
         src="https://images.unsplash.com/photo-1506543730435-e2c1d4553a84?q=80&w=2362&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         alt="Tab 2"
+        width={400}
+        height={240}
         className="rounded-lg w-full h-60 object-cover mt-0 !m-0 shadow-md border-none"
       />
       <div className="flex flex-col gap-y-2">
@@ -67,9 +72,11 @@ const defaultTabs: Tab[] = [
   label: "Tab 3",
   content: (
     <div className="grid grid-cols-2 gap-4 w-full h-full">
-      <img
+      <Image
         src="https://images.unsplash.com/photo-1522428938647-2baa7c899f2f?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         alt="Tab 3"
+        width={400}
+        height={240}
         className="rounded-lg w-full h-60 object-cover mt-0 !m-0 shadow-md border-none"
       />
       <div className="flex flex-col gap-y-2">

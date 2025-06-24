@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { CldUploadWidget, CloudinaryUploadWidgetResults } from 'next-cloudinary';
+import { CldUploadWidget, CloudinaryUploadWidgetResults, CloudinaryUploadWidgetError } from 'next-cloudinary';
 
 export default function TestCloudinary() {
-  const [uploadResult, setUploadResult] = useState<any>(null);
+  const [uploadResult, setUploadResult] = useState<CloudinaryUploadWidgetResults['info'] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Afficher les variables d'environnement
@@ -28,9 +28,15 @@ export default function TestCloudinary() {
     }
   };
 
-  const handleError = (error: any) => {
+  const handleError = (error: CloudinaryUploadWidgetError) => {
     console.error('Widget error:', error);
-    setError(`Erreur du widget: ${error.message || 'Erreur inconnue'}`);
+    if (typeof error === 'string') {
+      setError(`Erreur du widget: ${error}`);
+    } else if (error && typeof error === 'object' && 'statusText' in error) {
+      setError(`Erreur du widget: ${error.statusText || 'Erreur inconnue'}`);
+    } else {
+      setError('Erreur du widget: Erreur inconnue');
+    }
   };
 
   return (
@@ -47,12 +53,12 @@ export default function TestCloudinary() {
 
       {/* Widget de test */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Test d'upload</h2>
+        <h2 className="text-xl font-semibold mb-4">Test d&apos;upload</h2>
 
         <div className="space-y-4">
           {/* Test avec notre preset */}
           <div>
-            <h3 className="text-lg font-medium mb-2">Test avec notre preset "africagnotte_media"</h3>
+            <h3 className="text-lg font-medium mb-2">Test avec notre preset &quot;africagnotte_media&quot;</h3>
             <CldUploadWidget
               uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
               onUpload={handleUpload}
@@ -123,17 +129,17 @@ export default function TestCloudinary() {
       <div className="mt-8 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
         <h3 className="font-semibold mb-2">🔧 Dépannage du preset Cloudinary</h3>
         <div className="mb-4">
-          <p className="font-semibold text-green-600">✅ PRESET CRÉÉ: Le preset "africagnotte_media" existe !</p>
-          <p className="text-red-600 font-semibold">❌ PROBLÈME: "Upload preset not found"</p>
+          <p className="font-semibold text-green-600">✅ PRESET CRÉÉ: Le preset &quot;africagnotte_media&quot; existe !</p>
+          <p className="text-red-600 font-semibold">❌ PROBLÈME: &quot;Upload preset not found&quot;</p>
         </div>
 
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded">
           <h4 className="font-semibold text-red-800 mb-2">🚨 Actions de dépannage :</h4>
           <ol className="list-decimal list-inside space-y-1 text-sm text-red-700">
-            <li><strong>Vérifiez que le preset est bien en mode "Unsigned"</strong> (pas "Signed")</li>
-            <li><strong>Sauvegardez le preset</strong> en cliquant sur "Save" dans Cloudinary</li>
+            <li><strong>Vérifiez que le preset est bien en mode &quot;Unsigned&quot;</strong> (pas &quot;Signed&quot;)</li>
+            <li><strong>Sauvegardez le preset</strong> en cliquant sur &quot;Save&quot; dans Cloudinary</li>
             <li><strong>Attendez 2-3 minutes</strong> pour la propagation</li>
-            <li><strong>Testez le bouton vert "ml_default"</strong> pour voir si Cloudinary fonctionne</li>
+            <li><strong>Testez le bouton vert &quot;ml_default&quot;</strong> pour voir si Cloudinary fonctionne</li>
           </ol>
         </div>
         <ol className="list-decimal list-inside space-y-2 text-sm">
@@ -150,7 +156,7 @@ export default function TestCloudinary() {
             <span className="text-xs">Ou allez directement à: Settings → Upload dans le menu de gauche</span>
           </li>
           <li>
-            <strong>Vérifiez que le preset "africagnotte_media" existe</strong>
+            <strong>Vérifiez que le preset &quot;africagnotte_media&quot; existe</strong>
           </li>
           <li>
             <strong>Configuration du preset:</strong>
@@ -165,7 +171,7 @@ export default function TestCloudinary() {
 
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
           <p className="text-blue-800 text-sm">
-            <strong>💡 Astuce:</strong> Le mode "Unsigned" est essentiel pour permettre les uploads depuis votre application frontend sans exposer votre API secret.
+            <strong>💡 Astuce:</strong> Le mode &quot;Unsigned&quot; est essentiel pour permettre les uploads depuis votre application frontend sans exposer votre API secret.
           </p>
         </div>
 

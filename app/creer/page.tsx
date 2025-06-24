@@ -310,7 +310,7 @@ export default function CreerCagnotte() {
             <h3 className="text-base sm:text-lg font-semibold mb-3">Informations de contact (optionnel)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="author-name" className="block text-sm font-medium mb-2">Nom de l'organisateur</label>
+                <label htmlFor="author-name" className="block text-sm font-medium mb-2">Nom de l&apos;organisateur</label>
                 <input
                   type="text"
                   id="author-name"

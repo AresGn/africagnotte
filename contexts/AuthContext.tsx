@@ -90,8 +90,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('[AuthContext] /api/auth/signin response status:', response.status);
       if (response.ok) {
         console.log('[AuthContext] Sign-in successful, calling fetchUserCallback');
-        await fetchUserCallback(); 
-        router.push('/'); // Rediriger APRÈS la mise à jour de l'utilisateur
+        await fetchUserCallback();
+
+        // Redirection intelligente selon le rôle
+        // On attend un peu que l'utilisateur soit mis à jour
+        setTimeout(() => {
+          // Récupérer l'utilisateur depuis le localStorage ou faire une nouvelle requête
+          fetch('/api/me', { credentials: 'include' })
+            .then(res => res.json())
+            .then(userData => {
+              console.log('[AuthContext] User data for redirect:', userData);
+              if (userData.user && (userData.user.role === 'super_admin' || userData.user.role === 'admin' || userData.user.role === 'moderator')) {
+                console.log('[AuthContext] Redirecting admin to /admin');
+                router.push('/admin');
+              } else {
+                console.log('[AuthContext] Redirecting user to /');
+                router.push('/');
+              }
+            })
+            .catch(err => {
+              console.error('[AuthContext] Error fetching user for redirect:', err);
+              router.push('/'); // Fallback vers la page normale
+            });
+        }, 500);
       } else {
         const errorData = await response.json();
         console.error('[AuthContext] Sign-in API error:', errorData);
@@ -138,12 +159,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log('[AuthContext] signOut called');
     setIsLoading(true);
     try {
-      await fetch('/api/auth/signout', { method: 'POST' });
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+        credentials: 'include' // S'assurer que les cookies sont inclus
+      });
+      console.log('[AuthContext] /api/auth/signout response status:', response.status);
+
+      // Forcer la suppression de l'utilisateur
       setUser(null);
       console.log('[AuthContext] User set to null after signout');
-      router.push('/connexion'); 
+
+      // Rediriger vers la page de connexion
+      router.push('/connexion');
     } catch (error) {
       console.error("[AuthContext] Error in signOut function:", error);
+      // Même en cas d'erreur, on supprime l'utilisateur localement
+      setUser(null);
+      router.push('/connexion');
     } finally {
       setIsLoading(false);
       console.log('[AuthContext] signOut finished. isLoading:', false);
