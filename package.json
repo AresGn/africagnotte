@@ -10,7 +10,13 @@
     "postinstall": "patch-package",
     "cloudinary:test": "node scripts/test-cloudinary-config.js",
     "cloudinary:verify": "node scripts/verify-preset-creation.js",
-    "cloudinary:create": "node scripts/create-cloudinary-preset.js"
+    "cloudinary:create": "node scripts/create-cloudinary-preset.js",
+    "admin:setup": "node scripts/setup-admin-neon.js",
+    "admin:create-user": "node scripts/setup-admin-neon.js create-admin",
+    "admin:create-test-users": "node scripts/create-test-users.js",
+    "admin:create-custom-user": "node scripts/create-test-users.js custom",
+    "admin:create-complete-users": "node scripts/create-complete-users.js",
+    "admin:check-users": "node scripts/create-complete-users.js check"
   },
   "dependencies": {
     "@cloudinary/url-gen": "^1.21.0",
@@ -19,6 +25,7 @@
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^16.5.0",
     "framer-motion": "^12.10.5",
     "install": "^0.13.0",
     "jose": "^6.0.11",
@@ -26,6 +33,7 @@
     "lucide-react": "^0.509.0",
     "next": "15.3.1",
     "next-cloudinary": "^6.16.0",
+    "node-fetch": "^3.3.2",
     "pg": "^8.16.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

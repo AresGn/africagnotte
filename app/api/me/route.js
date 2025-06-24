@@ -18,7 +18,7 @@ export async function GET(request) {
     let userProfile = {};
     try {
       const client = await pool.connect();
-      const result = await client.query('SELECT id, first_name, last_name, username, phone_number, country FROM profiles WHERE id = $1', [userId]);
+      const result = await client.query('SELECT id, first_name, last_name, username, phone_number, country, role FROM profiles WHERE id = $1', [userId]);
       if (result.rows.length > 0) {
         userProfile = result.rows[0];
       }

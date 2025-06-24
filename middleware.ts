@@ -17,6 +17,7 @@ export const config = {
     '/api/me/:path*',
     '/api/profile/:path*',
     '/api/cagnottes/:path*', // On vérifie toutes les routes cagnottes, mais on exclut les publiques dans le middleware
+    '/api/admin/:path*', // Ajouter les routes admin
   ],
 };
 
