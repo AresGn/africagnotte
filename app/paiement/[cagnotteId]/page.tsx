@@ -180,7 +180,7 @@ export default function PaiementPage() {
   }
 
   return (
-    <main className="py-10 bg-gray-50 min-h-screen">
+    <main className="pt-20 pb-10 bg-gray-50 min-h-screen">
       <Toaster position="top-center" />
       <div className="container mx-auto px-4 max-w-2xl">
         {/* En-tête */}

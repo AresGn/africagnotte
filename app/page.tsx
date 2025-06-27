@@ -163,6 +163,18 @@ export default function Home() {
             Ils ont été aidés
           </h2>
           <AnimatedTestimonialsDemo />
+          <div className="text-center mt-10">
+            <Link
+              href="/temoignages"
+              className="inline-flex items-center px-6 py-3 bg-white text-lg font-semibold rounded-md shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              style={{ color: 'var(--primary-color)' }}
+            >
+              Voir plus de témoignages
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </section>
 

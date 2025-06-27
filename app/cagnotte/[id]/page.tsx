@@ -194,7 +194,7 @@ export default function CagnotteDetail() {
   // Affichage de chargement
   if (loading) {
     return (
-      <main className="py-10 bg-gray-50">
+      <main className="pt-20 pb-10 bg-gray-50">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-500 mx-auto"></div>
