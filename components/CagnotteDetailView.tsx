@@ -140,14 +140,73 @@ export default function CagnotteDetailView({ cagnotte, cagnotteId }: CagnotteDet
   const targetAmount = cagnotte.target_amount || cagnotte.targetAmount;
   const createdDate = cagnotte.created_at ? new Date(cagnotte.created_at) : cagnotte.createdAt || new Date();
 
+  // Composant Card de participation réutilisable
+  const ParticipationCard = ({ className = "" }: { className?: string; isMobile?: boolean }) => (
+    <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
+      <div className="text-center">
+        {/* Montant collecté */}
+        <div className="mb-4">
+          <div className="text-4xl font-bold text-gray-800 mb-1">
+            {formatAmount(currentAmount)}
+          </div>
+          {targetAmount && cagnotte.show_target && (
+            <div className="text-gray-600">
+              collectés sur <span className="font-semibold">{formatAmount(targetAmount)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Barre de progression */}
+        {targetAmount && cagnotte.show_target && (
+          <div className="mb-4">
+            <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+              <div
+                className="bg-gradient-to-r from-lime-400 to-lime-500 h-3 rounded-full transition-all duration-500"
+                style={{
+                  width: `${Math.min((currentAmount / targetAmount) * 100, 100)}%`
+                }}
+              ></div>
+            </div>
+            <div className="text-sm text-gray-600">
+              {Math.round((currentAmount / targetAmount) * 100)}% atteint avec{' '}
+              <span className="font-semibold">{cagnotte.participants || donations.length} participants</span>
+            </div>
+          </div>
+        )}
+
+        {!targetAmount || !cagnotte.show_target ? (
+          <div className="mb-4 text-sm text-gray-600">
+            <FaUsers className="inline mr-2" />
+            {cagnotte.participants || donations.length} participants
+          </div>
+        ) : null}
+
+        {/* Bouton de participation */}
+        <Link
+          href={`/paiement/${cagnotteId}`}
+          className="w-full bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 mb-4"
+        >
+          <FaHeart className="text-lg" />
+          JE PARTICIPE
+        </Link>
+
+        {/* Sécurité */}
+        <div className="flex items-center justify-center text-sm text-gray-500">
+          <FaLock className="mr-2" />
+          Plateforme 100% sécurisée
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <main className="py-10 bg-gray-50">
-      <div className="container mx-auto px-4 max-w-5xl">
+    <main className="pt-20 pb-10 bg-gray-50">
+      <div className="container mx-auto px-4 max-w-7xl">
         {/* Titre de la cagnotte */}
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">{cagnotte.title}</h1>
 
         {/* Badge de confiance */}
-        <div className="bg-green-100 border border-green-300 rounded-lg p-4 mb-8 flex items-center">
+        <div className="bg-green-100 border border-green-300 rounded-lg p-4 mb-8 flex items-center max-w-5xl mx-auto">
           <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white mr-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -159,65 +218,17 @@ export default function CagnotteDetailView({ cagnotte, cagnotteId }: CagnotteDet
           </p>
         </div>
 
-        {/* Section de participation */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 max-w-md mx-auto">
-          <div className="text-center">
-            {/* Montant collecté */}
-            <div className="mb-4">
-              <div className="text-4xl font-bold text-gray-800 mb-1">
-                {formatAmount(currentAmount)}
-              </div>
-              {targetAmount && cagnotte.show_target && (
-                <div className="text-gray-600">
-                  collectés sur <span className="font-semibold">{formatAmount(targetAmount)}</span>
-                </div>
-              )}
+        {/* Layout principal : 2 colonnes sur desktop, 1 colonne sur mobile */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Colonne principale (contenu) */}
+          <div className="flex-1 lg:max-w-3xl">
+            {/* Card de participation mobile (visible uniquement sur mobile) */}
+            <div className="lg:hidden mb-8">
+              <ParticipationCard isMobile={true} />
             </div>
 
-            {/* Barre de progression */}
-            {targetAmount && cagnotte.show_target && (
-              <div className="mb-4">
-                <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-                  <div
-                    className="bg-gradient-to-r from-lime-400 to-lime-500 h-3 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min((currentAmount / targetAmount) * 100, 100)}%`
-                    }}
-                  ></div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  {Math.round((currentAmount / targetAmount) * 100)}% atteint avec{' '}
-                  <span className="font-semibold">{cagnotte.participants || donations.length} participants</span>
-                </div>
-              </div>
-            )}
-
-            {!targetAmount || !cagnotte.show_target ? (
-              <div className="mb-4 text-sm text-gray-600">
-                <FaUsers className="inline mr-2" />
-                {cagnotte.participants || donations.length} participants
-              </div>
-            ) : null}
-
-            {/* Bouton de participation */}
-            <Link
-              href={`/paiement/${cagnotteId}`}
-              className="w-full bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 mb-4"
-            >
-              <FaHeart className="text-lg" />
-              JE PARTICIPE
-            </Link>
-
-            {/* Sécurité */}
-            <div className="flex items-center justify-center text-sm text-gray-500">
-              <FaLock className="mr-2" />
-              Plateforme 100% sécurisée
-            </div>
-          </div>
-        </div>
-
-        {/* Onglets */}
-        <div className="mb-6 border-b border-gray-200">
+            {/* Onglets */}
+            <div className="mb-6 border-b border-gray-200">
           <div className="flex">
             <button
               className={`py-3 px-6 font-medium text-lg ${activeTab === 'pourquoi' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-gray-500 hover:text-gray-700'}`}
@@ -546,59 +557,73 @@ export default function CagnotteDetailView({ cagnotte, cagnotteId }: CagnotteDet
           </div>
         )}
 
-        {/* Section de partage */}
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
-          <h3 className="text-lg sm:text-xl font-semibold mb-4 text-center">Mobilisez du monde ! Votre soutien passe aussi par le partage :</h3>
+            {/* Section de partage */}
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
+              <h3 className="text-lg sm:text-xl font-semibold mb-4 text-center">Mobilisez du monde ! Votre soutien passe aussi par le partage :</h3>
 
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6">
-            <a
-              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-blue-700 transition-colors text-sm sm:text-base"
-            >
-              <FaFacebook className="text-xl" /> <span className="hidden xs:inline">Facebook</span>
-            </a>
-            <a
-              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`)}&text=${encodeURIComponent(`Soutenez la cagnotte: ${cagnotte.title}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-400 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-blue-500 transition-colors text-sm sm:text-base"
-            >
-              <FaTwitter className="text-xl" /> <span className="hidden xs:inline">Twitter</span>
-            </a>
-            <a
-              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Soutenez la cagnotte: ${cagnotte.title} ${cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-green-500 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-green-600 transition-colors text-sm sm:text-base"
-            >
-              <FaWhatsapp className="text-xl" /> <span className="hidden xs:inline">WhatsApp</span>
-            </a>
-            <a
-              href={`sms:&body=${encodeURIComponent(`Soutenez la cagnotte: ${cagnotte.title} ${cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-600 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-gray-700 transition-colors text-sm sm:text-base"
-            >
-              <FaSms className="text-xl" /> <span className="hidden xs:inline">SMS</span>
-            </a>
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6">
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                >
+                  <FaFacebook className="text-xl" /> <span className="hidden xs:inline">Facebook</span>
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`)}&text=${encodeURIComponent(`Soutenez la cagnotte: ${cagnotte.title}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-400 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-blue-500 transition-colors text-sm sm:text-base"
+                >
+                  <FaTwitter className="text-xl" /> <span className="hidden xs:inline">Twitter</span>
+                </a>
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Soutenez la cagnotte: ${cagnotte.title} ${cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-green-500 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-green-600 transition-colors text-sm sm:text-base"
+                >
+                  <FaWhatsapp className="text-xl" /> <span className="hidden xs:inline">WhatsApp</span>
+                </a>
+                <a
+                  href={`sms:&body=${encodeURIComponent(`Soutenez la cagnotte: ${cagnotte.title} ${cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-600 text-white rounded-md flex items-center gap-1 sm:gap-2 hover:bg-gray-700 transition-colors text-sm sm:text-base"
+                >
+                  <FaSms className="text-xl" /> <span className="hidden xs:inline">SMS</span>
+                </a>
+              </div>
+
+              <div className="flex">
+                <input
+                  type="text"
+                  value={cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`}
+                  readOnly
+                  className="flex-1 p-3 bg-gray-100 rounded-l-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className="px-4 py-3 bg-amber-500 text-white rounded-r-md hover:bg-amber-600 transition-colors flex items-center gap-2"
+                >
+                  <FaCopy /> {copiedLink ? 'Copié !' : 'Copier'}
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="flex">
-            <input
-              type="text"
-              value={cagnotte.custom_url ? `https://africagnotte.com/c/${cagnotte.custom_url}` : `https://africagnotte.com/cagnotte/${cagnotteId}`}
-              readOnly
-              className="flex-1 p-3 bg-gray-100 rounded-l-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
-            <button
-              onClick={handleCopyLink}
-              className="px-4 py-3 bg-amber-500 text-white rounded-r-md hover:bg-amber-600 transition-colors flex items-center gap-2"
-            >
-              <FaCopy /> {copiedLink ? 'Copié !' : 'Copier'}
-            </button>
+          {/* Colonne de droite (Card de participation fixe - desktop uniquement) */}
+          <div className="hidden lg:block lg:w-80">
+            <div className="sticky top-24">
+              <ParticipationCard />
+            </div>
           </div>
+        </div>
+
+        {/* Card de participation mobile en bas (après les commentaires) */}
+        <div className="lg:hidden mt-8 max-w-md mx-auto">
+          <ParticipationCard isMobile={true} />
         </div>
       </div>
     </main>

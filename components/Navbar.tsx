@@ -53,25 +53,22 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-6">
           <Link href="/recherche" className="font-medium hover:text-amber-500 transition-colors">
-            Rechercher une cagnotte
+            Rechercher
           </Link>
           <Link href="/creer" className="font-medium hover:text-amber-500 transition-colors">
-            Créer une cagnotte
+            Créer
           </Link>
-          <Link href="/comment-ca-marche" className="font-medium hover:text-amber-500 transition-colors">
-            Comment ça marche
+          <Link href="/temoignages" className="font-medium hover:text-amber-500 transition-colors">
+            Témoignages
           </Link>
         </div>
         
         {/* CTA Buttons or User Profile */}
         {!isAuthenticated ? (
-          // Utilisateur non connecté: Afficher les boutons Connexion/Inscription
-          <div className="hidden md:flex space-x-3">
-            <Link href="/connexion" className="btn-secondary">
+          // Utilisateur non connecté: Afficher le bouton Connexion
+          <div className="hidden md:flex">
+            <Link href="/connexion" className="btn-primary">
               Connexion
-            </Link>
-            <Link href="/inscription" className="btn-primary">
-              Inscription
             </Link>
           </div>
         ) : (
@@ -165,8 +162,8 @@ export default function Navbar() {
             <Link href="/creer" className="font-medium py-2 hover:text-amber-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>
               Créer une cagnotte
             </Link>
-            <Link href="/comment-ca-marche" className="font-medium py-2 hover:text-amber-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>
-              Comment ça marche
+            <Link href="/temoignages" className="font-medium py-2 hover:text-amber-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+              Témoignages
             </Link>
           </div>
           

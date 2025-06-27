@@ -44,7 +44,7 @@ export default function CagnottePage({ params }: { params: Promise<{ slug: strin
 
   if (error || !cagnotte) {
     return (
-      <div className="py-10 bg-gray-50">
+      <div className="pt-20 pb-10 bg-gray-50">
         <div className="container mx-auto px-4 max-w-5xl text-center">
           <div className="bg-white rounded-lg shadow-md p-8">
             <h1 className="text-2xl font-bold text-red-600 mb-4">Cagnotte introuvable</h1>

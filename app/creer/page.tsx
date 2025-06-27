@@ -129,7 +129,7 @@ export default function CreerCagnotte() {
   };
 
   return (
-    <main className="py-6 sm:py-10 bg-gray-50">
+    <main className="pt-20 pb-6 sm:pb-10 bg-gray-50">
       <div className="container mx-auto max-w-3xl px-4">
         <Toaster position="top-center" />
         <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-10">Créer une cagnotte</h1>

@@ -199,7 +199,7 @@ export default function ModifierCagnotte() {
 
   if (pageLoading) {
     return (
-      <main className="py-6 sm:py-10 bg-gray-50">
+      <main className="pt-20 pb-6 sm:pb-10 bg-gray-50">
         <div className="container mx-auto max-w-3xl px-4">
           <div className="text-center py-12">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent text-lime-500"></div>
@@ -212,7 +212,7 @@ export default function ModifierCagnotte() {
 
   if (!cagnotte) {
     return (
-      <main className="py-6 sm:py-10 bg-gray-50">
+      <main className="pt-20 pb-6 sm:pb-10 bg-gray-50">
         <div className="container mx-auto max-w-3xl px-4">
           <div className="text-center py-12">
             <p className="text-xl text-red-600">Cagnotte introuvable</p>
@@ -223,7 +223,7 @@ export default function ModifierCagnotte() {
   }
 
   return (
-    <main className="py-6 sm:py-10 bg-gray-50">
+    <main className="pt-20 pb-6 sm:pb-10 bg-gray-50">
       <div className="container mx-auto max-w-3xl px-4">
         <Toaster position="top-center" />
         <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-10">Modifier la cagnotte</h1>

@@ -80,7 +80,7 @@ export default function CagnottesPage() { // Nom du composant changé pour évit
   }
 
   return (
-    <main className="py-6 sm:py-10 bg-gray-50">
+    <main className="pt-20 pb-6 sm:pb-10 bg-gray-50">
       <Toaster position="top-center" />
       <div className="container mx-auto max-w-6xl px-4">
         <div className="flex justify-between items-center mb-8">
