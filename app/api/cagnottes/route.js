@@ -64,7 +64,7 @@ export async function POST(request) {
 
     const client = await pool.connect();
     const result = await client.query(
-      'INSERT INTO cagnottes (user_id, title, custom_url, category, description, long_description, author_name, author_phone, author_socials, images, video, is_private, show_target, target_amount, hide_amount, show_participants, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *',
+      'INSERT INTO cagnottes (user_id, title, custom_url, category, description, long_description, author_name, author_phone, author_socials, images, video, is_private, show_target, target_amount, hide_amount, show_participants, status, moderation_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *',
       [
         userId,
         title,
@@ -82,7 +82,8 @@ export async function POST(request) {
         target_amount || null,
         hide_amount || false,
         show_participants !== undefined ? show_participants : true, // Valeur par défaut si non fournie
-        'active' // Statut par défaut lors de la création
+        'active', // Statut par défaut lors de la création
+        'pending' // Statut de modération par défaut - doit être approuvé par un admin
       ]
     );
     client.release();

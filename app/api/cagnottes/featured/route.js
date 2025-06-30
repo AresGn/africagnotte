@@ -28,10 +28,11 @@ export async function GET() {
         created_at, 
         updated_at,
         author_name
-      FROM cagnottes 
-      WHERE is_private = false 
+      FROM cagnottes
+      WHERE is_private = false
         AND status = 'active'
-      ORDER BY created_at DESC 
+        AND moderation_status = 'approved'
+      ORDER BY created_at DESC
       LIMIT 3`
     );
     

@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const client = await pool.connect();
     const result = await client.query(
-      "SELECT id, user_id, title, custom_url, category, description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, current_amount, status, created_at, updated_at FROM cagnottes WHERE is_private = false ORDER BY created_at DESC"
+      "SELECT id, user_id, title, custom_url, category, description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, current_amount, status, created_at, updated_at FROM cagnottes WHERE is_private = false AND moderation_status = 'approved' ORDER BY created_at DESC"
     );
     client.release();
 
