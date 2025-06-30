@@ -51,8 +51,10 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><Link href="/category/sante" className="hover:text-gray-300">Santé</Link></li>
               <li><Link href="/category/famille" className="hover:text-gray-300">Famille</Link></li>
-              <li><Link href="/category/orphelins" className="hover:text-gray-300">Orphelins</Link></li>
-              <li><Link href="/category/urgences" className="hover:text-gray-300">Urgences</Link></li>
+              <li><Link href="/category/education" className="hover:text-gray-300">Éducation</Link></li>
+              <li><Link href="/category/entrepreneuriat-social" className="hover:text-gray-300">Entrepreneuriat</Link></li>
+              <li><Link href="/category/acces-eau" className="hover:text-gray-300">Accès à l'eau</Link></li>
+              <li><Link href="/category/environnement" className="hover:text-gray-300">Environnement</Link></li>
             </ul>
           </div>
           <div>

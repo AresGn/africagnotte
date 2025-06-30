@@ -7,12 +7,20 @@ import MediaUpload from '../../../../components/MediaUpload';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { toast, Toaster } from 'react-hot-toast';
 
-// Utilisation des mêmes catégories que sur la page de création
+// Catégories étendues pour couvrir plus de besoins sociaux
 const categories = [
   { name: 'Santé', emoji: '🏥' },
   { name: 'Famille', emoji: '👪' },
   { name: 'Orphelins', emoji: '👶' },
-  { name: 'Urgences', emoji: '🚨' }
+  { name: 'Urgences', emoji: '🚨' },
+  { name: 'Éducation', emoji: '📚' },
+  { name: 'Entrepreneuriat Social', emoji: '💼' },
+  { name: 'Accès à l\'eau', emoji: '💧' },
+  { name: 'Sécurité Alimentaire', emoji: '🌾' },
+  { name: 'Logement Décent', emoji: '🏠' },
+  { name: 'Handicap & Inclusion', emoji: '♿' },
+  { name: 'Femmes & Autonomisation', emoji: '👩' },
+  { name: 'Environnement', emoji: '🌱' }
 ];
 
 interface Cagnotte {

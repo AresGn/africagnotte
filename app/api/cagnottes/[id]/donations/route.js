@@ -104,20 +104,69 @@ export async function POST(request, { params }) {
       amount,
       comment,
       is_anonymous = false,
-      payment_reference
+      payment_reference,
+      donation_type = 'monetary',
+      // Champs pour services
+      service_type,
+      service_description,
+      service_duration,
+      service_availability,
+      // Champs pour biens matériels
+      material_type,
+      material_description,
+      material_quantity,
+      material_condition,
+      // Champs pour compétences
+      skill_type,
+      skill_description,
+      skill_level,
+      skill_availability,
+      // Champs communs pour dons non-monétaires
+      estimated_value,
+      contact_info,
+      delivery_method,
+      location_constraint
     } = body;
 
     // Validation des données
-    if (!donor_name || !amount) {
-      return NextResponse.json({ 
-        error: 'Le nom du donateur et le montant sont requis.' 
+    if (!donor_name) {
+      return NextResponse.json({
+        error: 'Le nom du donateur est requis.'
       }, { status: 400 });
     }
 
-    if (amount <= 0) {
-      return NextResponse.json({ 
-        error: 'Le montant doit être supérieur à 0.' 
-      }, { status: 400 });
+    // Validation spécifique selon le type de don
+    if (donation_type === 'monetary') {
+      if (!amount || amount <= 0) {
+        return NextResponse.json({
+          error: 'Le montant doit être supérieur à 0 pour un don monétaire.'
+        }, { status: 400 });
+      }
+    } else {
+      if (!estimated_value || estimated_value <= 0) {
+        return NextResponse.json({
+          error: 'La valeur estimée doit être supérieure à 0.'
+        }, { status: 400 });
+      }
+
+      // Validation des champs spécifiques
+      if (donation_type === 'service' && (!service_type || !service_description)) {
+        return NextResponse.json({
+          error: 'Le type et la description du service sont requis.'
+        }, { status: 400 });
+      }
+
+      if (donation_type === 'material' && (!material_type || !material_description)) {
+        return NextResponse.json({
+          error: 'Le type et la description du bien matériel sont requis.'
+        }, { status: 400 });
+      }
+
+      if (donation_type === 'skill' && (!skill_type || !skill_description)) {
+        return NextResponse.json({
+          error: 'Le type et la description de la compétence sont requis.'
+        }, { status: 400 });
+      }
     }
 
     const client = await pool.connect();
@@ -140,25 +189,60 @@ export async function POST(request, { params }) {
       }, { status: 400 });
     }
 
-    // Créer le don
+    // Créer le don avec support de la diversification
     const donationResult = await client.query(
-      `INSERT INTO cagnotte_donations 
-       (cagnotte_id, donor_name, amount, comment, is_anonymous, payment_reference, payment_status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO cagnotte_donations
+       (cagnotte_id, donor_name, amount, comment, is_anonymous, payment_reference, payment_status,
+        donation_type, service_type, service_description, service_duration, service_availability,
+        material_type, material_description, material_quantity, material_condition,
+        skill_type, skill_description, skill_level, skill_availability,
+        estimated_value, contact_info, delivery_method, location_constraint)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
        RETURNING *`,
-      [cagnotteId, donor_name, amount, comment || null, is_anonymous, payment_reference || null, 'pending']
+      [
+        cagnotteId,
+        donor_name,
+        donation_type === 'monetary' ? amount : null,
+        comment || null,
+        is_anonymous,
+        payment_reference || null,
+        'pending',
+        donation_type,
+        service_type || null,
+        service_description || null,
+        service_duration || null,
+        service_availability || null,
+        material_type || null,
+        material_description || null,
+        material_quantity || null,
+        material_condition || null,
+        skill_type || null,
+        skill_description || null,
+        skill_level || null,
+        skill_availability || null,
+        estimated_value || null,
+        contact_info ? JSON.stringify(contact_info) : null,
+        delivery_method || null,
+        location_constraint || null
+      ]
     );
 
     client.release();
 
     const donation = donationResult.rows[0];
 
+    const successMessage = donation_type === 'monetary'
+      ? 'Don créé avec succès.'
+      : 'Contribution enregistrée avec succès.';
+
     return NextResponse.json({
-      message: 'Don créé avec succès.',
+      message: successMessage,
       donation: {
         id: donation.id,
         donor_name: donation.is_anonymous ? 'Anonyme' : donation.donor_name,
         amount: donation.amount,
+        donation_type: donation.donation_type,
+        estimated_value: donation.estimated_value,
         comment: donation.comment,
         payment_status: donation.payment_status,
         created_at: donation.created_at

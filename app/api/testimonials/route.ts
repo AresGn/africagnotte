@@ -28,6 +28,11 @@ export async function GET(request: NextRequest) {
         category,
         impact,
         is_featured,
+        likes_count,
+        hearts_count,
+        support_count,
+        inspire_count,
+        total_reactions,
         created_at,
         updated_at
       FROM testimonials 
@@ -80,6 +85,13 @@ export async function GET(request: NextRequest) {
       category: row.category,
       impact: row.impact || [],
       isFeatured: row.is_featured,
+      reactions: {
+        likes: row.likes_count || 0,
+        hearts: row.hearts_count || 0,
+        support: row.support_count || 0,
+        inspire: row.inspire_count || 0,
+        total: row.total_reactions || 0
+      },
       date: row.created_at.toISOString().split('T')[0],
       createdAt: row.created_at,
       updatedAt: row.updated_at

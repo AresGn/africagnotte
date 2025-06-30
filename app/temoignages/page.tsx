@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaPlay, FaQuoteLeft, FaHeart, FaUsers, FaCalendarAlt, FaSpinner } from 'react-icons/fa';
+import { FaPlay, FaQuoteLeft, FaHeart, FaUsers, FaCalendarAlt, FaSpinner, FaVideo } from 'react-icons/fa';
+import VideoPlayer from '../../components/VideoPlayer';
+import TestimonialReactions from '../../components/TestimonialReactions';
 
 // Interface pour les témoignages
 interface Testimonial {
@@ -30,6 +32,7 @@ export default function TemoignagesPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTestimonials();
@@ -285,22 +288,37 @@ Après 18 mois de formation intensive, Ibrahim travaille maintenant comme dével
           {displayTestimonials.map((testimonial) => (
             <div key={testimonial.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="md:flex">
-                {/* Image principale */}
+                {/* Image principale ou vidéo */}
                 <div className="md:w-1/3 relative">
                   <div className="aspect-square md:aspect-auto md:h-full relative">
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
-                    />
-                    {testimonial.video && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                          <FaPlay className="text-white text-xl ml-1" />
-                        </div>
-                      </div>
+                    {playingVideo === testimonial.id && testimonial.video ? (
+                      <VideoPlayer
+                        src={testimonial.video}
+                        poster={testimonial.image}
+                        title={`Témoignage de ${testimonial.name}`}
+                        className="w-full h-full rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                        autoPlay={true}
+                      />
+                    ) : (
+                      <>
+                        <Image
+                          src={testimonial.image}
+                          alt={testimonial.name}
+                          fill
+                          style={{ objectFit: 'cover' }}
+                          className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                        />
+                        {testimonial.video && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <button
+                              onClick={() => setPlayingVideo(testimonial.id)}
+                              className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all group"
+                            >
+                              <FaPlay className="text-white text-xl ml-1 group-hover:scale-110 transition-transform" />
+                            </button>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -322,6 +340,15 @@ Après 18 mois de formation intensive, Ibrahim travaille maintenant comme dével
                         <FaCalendarAlt className="inline mr-1" />
                         {formatDate(testimonial.date)}
                       </div>
+                      {testimonial.video && (
+                        <button
+                          onClick={() => setPlayingVideo(playingVideo === testimonial.id ? null : testimonial.id)}
+                          className="mt-2 inline-flex items-center px-3 py-1 bg-amber-100 text-amber-800 text-sm font-medium rounded-full hover:bg-amber-200 transition-colors"
+                        >
+                          <FaVideo className="mr-1" />
+                          {playingVideo === testimonial.id ? 'Voir photo' : 'Voir vidéo'}
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -346,6 +373,11 @@ Après 18 mois de formation intensive, Ibrahim travaille maintenant comme dével
                         <span>{testimonial.donorsCount} donateurs</span>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Système de réactions */}
+                  <div className="mb-4">
+                    <TestimonialReactions testimonialId={testimonial.id} />
                   </div>
 
                   <Link

@@ -4,8 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaPlay, FaHeart, FaUsers, FaCalendarAlt, FaArrowLeft, FaFacebook, FaTwitter, FaWhatsapp, FaSpinner } from 'react-icons/fa';
+import { FaPlay, FaHeart, FaUsers, FaCalendarAlt, FaArrowLeft, FaFacebook, FaTwitter, FaWhatsapp, FaSpinner, FaVideo } from 'react-icons/fa';
 import { ImageComparison, ImageComparisonImage, ImageComparisonSlider } from '../../../components/ui/image-comparison';
+import VideoPlayer from '../../../components/VideoPlayer';
+import TestimonialReactions from '../../../components/TestimonialReactions';
 
 // Interface pour les témoignages (même que dans la page principale)
 interface Testimonial {
@@ -259,14 +261,13 @@ export default function TestimonialDetailPage() {
             {/* Vidéo ou image principale */}
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               {isVideoPlaying && testimonial.video ? (
-                <div className="aspect-video">
-                  <video
-                    src={testimonial.video}
-                    controls
-                    autoPlay
-                    className="w-full h-full"
-                  />
-                </div>
+                <VideoPlayer
+                  src={testimonial.video}
+                  poster={testimonial.image}
+                  title={`Témoignage de ${testimonial.name}`}
+                  className="aspect-video w-full"
+                  autoPlay={true}
+                />
               ) : (
                 <div className="aspect-video relative">
                   <Image
@@ -279,12 +280,25 @@ export default function TestimonialDetailPage() {
                     <div className="absolute inset-0 flex items-center justify-center">
                       <button
                         onClick={() => setIsVideoPlaying(true)}
-                        className="w-20 h-20 bg-black bg-opacity-50 rounded-full flex items-center justify-center hover:bg-opacity-70 transition-all"
+                        className="w-20 h-20 bg-black bg-opacity-50 rounded-full flex items-center justify-center hover:bg-opacity-70 transition-all group"
                       >
-                        <FaPlay className="text-white text-2xl ml-1" />
+                        <FaPlay className="text-white text-2xl ml-1 group-hover:scale-110 transition-transform" />
                       </button>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Bouton pour basculer entre vidéo et image */}
+              {testimonial.video && (
+                <div className="p-4 bg-gray-50 border-t">
+                  <button
+                    onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+                    className="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-800 rounded-lg hover:bg-amber-200 transition-colors"
+                  >
+                    <FaVideo className="mr-2" />
+                    {isVideoPlaying ? 'Voir la photo' : 'Voir la vidéo'}
+                  </button>
                 </div>
               )}
             </div>
@@ -357,6 +371,12 @@ export default function TestimonialDetailPage() {
                   <div className="text-sm text-gray-600">Catégorie</div>
                 </div>
               </div>
+            </div>
+
+            {/* Système de réactions */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Votre réaction</h3>
+              <TestimonialReactions testimonialId={testimonial.id} />
             </div>
 
             {/* Impact */}
