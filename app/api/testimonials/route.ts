@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
-
-// Configuration pour Neon
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+import pool from '../../../lib/db';
 
 export async function GET(request: NextRequest) {
+  const client = await pool.connect();
+
   try {
     const { searchParams } = new URL(request.url);
     const featured = searchParams.get('featured');
@@ -66,7 +60,7 @@ export async function GET(request: NextRequest) {
       queryParams.push(parseInt(limit));
     }
 
-    const result = await pool.query(query, queryParams);
+    const result = await client.query(query, queryParams);
 
     // Formater les données pour le frontend
     const testimonials = result.rows.map(row => ({
@@ -100,16 +94,20 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Erreur lors de la récupération des témoignages:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Erreur lors de la récupération des témoignages' 
+      {
+        success: false,
+        error: 'Erreur lors de la récupération des témoignages'
       },
       { status: 500 }
     );
+  } finally {
+    client.release();
   }
 }
 
 export async function POST(request: NextRequest) {
+  const client = await pool.connect();
+
   try {
     const body = await request.json();
     const {
@@ -142,7 +140,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await pool.query(`
+    const result = await client.query(`
       INSERT INTO testimonials (
         name, age, location, story, short_description, main_image,
         before_image, after_image, video_url, additional_images,
@@ -198,11 +196,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Erreur lors de la création du témoignage:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Erreur lors de la création du témoignage' 
+      {
+        success: false,
+        error: 'Erreur lors de la création du témoignage'
       },
       { status: 500 }
     );
+  } finally {
+    client.release();
   }
 }

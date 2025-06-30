@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
         p.username as creator_username,
         p.first_name as creator_first_name,
         p.last_name as creator_last_name,
-        p.email as creator_email,
+        p.phone_number as creator_phone,
         moderator.username as moderator_username,
         moderator.first_name as moderator_first_name,
         moderator.last_name as moderator_last_name
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
         username: row.creator_username,
         first_name: row.creator_first_name,
         last_name: row.creator_last_name,
-        email: row.creator_email
+        phone: row.creator_phone
       },
       moderator: row.moderator_username ? {
         username: row.moderator_username,
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
       delete cagnotte.creator_username;
       delete cagnotte.creator_first_name;
       delete cagnotte.creator_last_name;
-      delete cagnotte.creator_email;
+      delete cagnotte.creator_phone;
       delete cagnotte.moderator_username;
       delete cagnotte.moderator_first_name;
       delete cagnotte.moderator_last_name;

@@ -1,13 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
-
-// Configuration pour Neon
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+import pool from '../../../../lib/db';
 
 export async function GET(
   request: NextRequest,

@@ -4,12 +4,12 @@ import pool from '../../../../../../lib/db';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Vérifier l'authentification admin (minimum moderator)
     const authResult = await verifyAdminRole(request, UserRole.MODERATOR);
-    
+
     if (!authResult.authorized) {
       return NextResponse.json(
         { error: authResult.error || 'Accès non autorisé' },
@@ -17,7 +17,7 @@ export async function POST(
       );
     }
 
-    const cagnotteId = params.id;
+    const { id: cagnotteId } = await params;
     const body = await request.json();
     const { action, reason, notes } = body;
 
@@ -130,12 +130,12 @@ export async function POST(
 // GET - Récupérer l'historique de modération d'une cagnotte
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Vérifier l'authentification admin
     const authResult = await verifyAdminRole(request, UserRole.MODERATOR);
-    
+
     if (!authResult.authorized) {
       return NextResponse.json(
         { error: authResult.error || 'Accès non autorisé' },
@@ -143,7 +143,7 @@ export async function GET(
       );
     }
 
-    const cagnotteId = params.id;
+    const { id: cagnotteId } = await params;
     const client = await pool.connect();
 
     // Récupérer l'historique de modération
