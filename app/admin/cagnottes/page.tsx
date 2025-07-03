@@ -8,7 +8,6 @@ import {
   FiXCircle,
   FiAlertTriangle,
   FiSearch,
-  FiFilter,
   FiEye,
   FiUser,
   FiCalendar,

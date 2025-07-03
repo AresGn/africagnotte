@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   FiUsers, 
   FiSearch, 
@@ -15,7 +15,6 @@ import {
   FiRefreshCw,
   FiSettings
 } from 'react-icons/fi';
-import { toast } from 'react-hot-toast';
 
 interface User {
   id: string;
@@ -76,15 +75,11 @@ export default function UsersPage() {
     super_admin: { label: 'Super Admin', color: 'text-red-600', bgColor: 'bg-red-100' }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, [selectedRole, selectedStatus, searchTerm, pagination.offset]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      
+
       if (selectedRole) params.append('role', selectedRole);
       if (selectedStatus) params.append('status', selectedStatus);
       if (searchTerm) params.append('search', searchTerm);
@@ -106,11 +101,15 @@ export default function UsersPage() {
 
     } catch (error) {
       console.error('Erreur:', error);
-      toast.error('Erreur lors du chargement des utilisateurs');
+      console.error('Erreur lors du chargement des utilisateurs');
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedRole, selectedStatus, searchTerm, pagination.limit, pagination.offset]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleUserAction = async (userId: string, action: string, role?: string) => {
     try {
@@ -132,7 +131,7 @@ export default function UsersPage() {
       }
 
       const result = await response.json();
-      toast.success(result.message);
+      console.log(result.message);
       
       // Recharger les données
       fetchUsers();
@@ -141,7 +140,7 @@ export default function UsersPage() {
 
     } catch (error) {
       console.error('Erreur:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'action');
+      console.error(error instanceof Error ? error.message : 'Erreur lors de l\'action');
     }
   };
 

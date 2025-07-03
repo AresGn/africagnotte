@@ -421,7 +421,7 @@ export default function DiversifiedDonationForm({ cagnotteId, onDonationSuccess 
                   onChange={(e) => setMaterialCondition(e.target.value)}
                   disabled={loading}
                 >
-                  <option value="">Sélectionnez l'état</option>
+                  <option value="">Sélectionnez l&apos;état</option>
                   <option value="neuf">Neuf</option>
                   <option value="tres_bon">Très bon état</option>
                   <option value="bon">Bon état</option>
@@ -475,7 +475,7 @@ export default function DiversifiedDonationForm({ cagnotteId, onDonationSuccess 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="skill-level" className="block text-sm font-medium mb-2">
-                  Niveau d'expertise
+                  Niveau d&apos;expertise
                 </label>
                 <select
                   id="skill-level"

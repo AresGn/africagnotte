@@ -53,7 +53,7 @@ export default function Footer() {
               <li><Link href="/category/famille" className="hover:text-gray-300">Famille</Link></li>
               <li><Link href="/category/education" className="hover:text-gray-300">Éducation</Link></li>
               <li><Link href="/category/entrepreneuriat-social" className="hover:text-gray-300">Entrepreneuriat</Link></li>
-              <li><Link href="/category/acces-eau" className="hover:text-gray-300">Accès à l'eau</Link></li>
+              <li><Link href="/category/acces-eau" className="hover:text-gray-300">Accès à l&apos;eau</Link></li>
               <li><Link href="/category/environnement" className="hover:text-gray-300">Environnement</Link></li>
             </ul>
           </div>
