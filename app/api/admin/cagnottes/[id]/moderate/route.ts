@@ -56,7 +56,7 @@ export async function POST(
         );
       }
 
-      const cagnotte = cagnotteResult.rows[0];
+      // const cagnotte = cagnotteResult.rows[0];
 
       // Déterminer le nouveau statut de modération
       let newModerationStatus: string;

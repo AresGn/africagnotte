@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   FiFileText,
   FiClock,
@@ -95,7 +95,7 @@ export default function AdminCagnottes() {
     hasMore: false
   });
 
-  const fetchCagnottes = async () => {
+  const fetchCagnottes = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -124,11 +124,11 @@ export default function AdminCagnottes() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedStatus, searchTerm, pagination.limit, pagination.offset]);
 
   useEffect(() => {
     fetchCagnottes();
-  }, [selectedStatus, searchTerm, pagination.offset]);
+  }, [fetchCagnottes]);
 
   const handleModeration = async (cagnotteId: string, action: string, reason?: string, notes?: string) => {
     try {

@@ -7,9 +7,7 @@ import {
   FiFilter,
   FiEye,
   FiUserCheck,
-  FiUserX,
   FiShield,
-  FiMail,
   FiMapPin,
   FiPhone,
   FiCalendar,
@@ -20,12 +18,11 @@ import {
 interface User {
   id: string;
   username: string;
-  email: string;
   first_name?: string;
   last_name?: string;
   phone_number?: string;
+  country?: string;
   role: string;
-  is_active: boolean;
   created_at: string;
   updated_at: string;
   cagnottes_count: number;
@@ -376,23 +373,7 @@ export default function UsersPage() {
                         Voir
                       </button>
 
-                      {user.is_active ? (
-                        <button
-                          onClick={() => openActionModal(user, 'deactivate')}
-                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                        >
-                          <FiUserX className="h-4 w-4 mr-1" />
-                          Désactiver
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => openActionModal(user, 'activate')}
-                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                        >
-                          <FiUserCheck className="h-4 w-4 mr-1" />
-                          Activer
-                        </button>
-                      )}
+
 
                       <button
                         onClick={() => openActionModal(user, 'change_role')}
@@ -449,9 +430,11 @@ export default function UsersPage() {
               <p className="text-sm text-gray-600 mb-2">
                 <strong>Utilisateur:</strong> {getUserName(selectedUser)}
               </p>
-              <p className="text-sm text-gray-600 mb-2">
-                <strong>Email:</strong> {selectedUser.email}
-              </p>
+              {selectedUser.country && (
+                <p className="text-sm text-gray-600 mb-2">
+                  <strong>Pays:</strong> {selectedUser.country}
+                </p>
+              )}
               <p className="text-sm text-gray-600 mb-4">
                 <strong>Rôle actuel:</strong> {roleConfig[selectedUser.role as keyof typeof roleConfig].label}
               </p>

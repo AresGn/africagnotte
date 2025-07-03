@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const role = searchParams.get('role') || '';
-    const status = searchParams.get('status') || '';
+    // const status = searchParams.get('status') || '';
     const search = searchParams.get('search') || '';
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');

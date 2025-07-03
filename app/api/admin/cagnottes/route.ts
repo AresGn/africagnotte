@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     // Construire la requête avec filtres
     let whereClause = 'WHERE 1=1';
-    const queryParams: any[] = [];
+    const queryParams: (string | number)[] = [];
     let paramIndex = 1;
 
     if (status && ['pending', 'approved', 'rejected', 'suspended'].includes(status)) {

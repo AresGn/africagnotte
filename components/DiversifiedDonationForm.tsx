@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { FaMoneyBillWave, FaHandsHelping, FaBox, FaBrain } from 'react-icons/fa';
 
@@ -60,11 +60,7 @@ export default function DiversifiedDonationForm({ cagnotteId, onDonationSuccess 
   const [deliveryMethod, setDeliveryMethod] = useState('');
   const [locationConstraint, setLocationConstraint] = useState('');
 
-  useEffect(() => {
-    fetchCategories();
-  }, [donationType]);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     if (donationType === 'monetary') return;
     
     try {
@@ -76,7 +72,11 @@ export default function DiversifiedDonationForm({ cagnotteId, onDonationSuccess 
     } catch (error) {
       console.error('Erreur lors du chargement des catégories:', error);
     }
-  };
+  }, [donationType]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

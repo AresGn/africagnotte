@@ -20,7 +20,7 @@ export async function PUT(
 
     const { id: userId } = await params;
     const body = await request.json();
-    const { action, role, notes } = body;
+    const { action, role } = body;
 
     // Validation des données
     if (!action || !['activate', 'deactivate', 'change_role'].includes(action)) {
@@ -92,7 +92,7 @@ export async function PUT(
 
       // Appliquer l'action
       let updateQuery = '';
-      let updateParams = [];
+      let updateParams: (string | number)[] = [];
       let actionDescription = '';
 
       switch (action) {

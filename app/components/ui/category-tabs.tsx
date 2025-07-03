@@ -2,7 +2,7 @@
 
 import React from "react";
 import { AnimatedTabs } from "./animated-tabs";
-import { FaAmbulance, FaFirstAid, FaGraduationCap, FaUsers, FaBriefcase, FaTint, FaSeedling, FaHome, FaWheelchair, FaFemale } from "react-icons/fa";
+import { FaAmbulance, FaFirstAid, FaGraduationCap, FaUsers, FaBriefcase, FaTint, FaSeedling } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
 

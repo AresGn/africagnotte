@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FaHeart, FaThumbsUp, FaHandsHelping, FaLightbulb } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 
@@ -31,11 +31,7 @@ export default function TestimonialReactions({ testimonialId, className = '' }: 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchReactions();
-  }, [testimonialId]);
-
-  const fetchReactions = async () => {
+  const fetchReactions = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/testimonials/${testimonialId}/reactions`);
@@ -52,7 +48,11 @@ export default function TestimonialReactions({ testimonialId, className = '' }: 
     } finally {
       setLoading(false);
     }
-  };
+  }, [testimonialId]);
+
+  useEffect(() => {
+    fetchReactions();
+  }, [fetchReactions]);
 
   const handleReaction = async (reactionType: ReactionType) => {
     if (submitting) return;
