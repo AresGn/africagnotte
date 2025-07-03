@@ -10,6 +10,7 @@ import {
   FiUserX,
   FiShield,
   FiMail,
+  FiMapPin,
   FiPhone,
   FiCalendar,
   FiRefreshCw,
@@ -244,7 +245,7 @@ export default function UsersPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Nom, email, téléphone..."
+              placeholder="Nom, username, téléphone..."
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
@@ -329,31 +330,20 @@ export default function UsersPage() {
                           <FiShield className="h-3 w-3 mr-1" />
                           {roleInfo.label}
                         </span>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.is_active
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-red-100 text-red-600'
-                        }`}>
-                          {user.is_active ? (
-                            <>
-                              <FiUserCheck className="h-3 w-3 mr-1" />
-                              Actif
-                            </>
-                          ) : (
-                            <>
-                              <FiUserX className="h-3 w-3 mr-1" />
-                              Inactif
-                            </>
-                          )}
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-600">
+                          <FiUserCheck className="h-3 w-3 mr-1" />
+                          Actif
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                         <div className="space-y-1">
-                          <p className="text-sm text-gray-600 flex items-center">
-                            <FiMail className="h-4 w-4 mr-2" />
-                            {user.email}
-                          </p>
+                          {user.country && (
+                            <p className="text-sm text-gray-600 flex items-center">
+                              <FiMapPin className="h-4 w-4 mr-2" />
+                              {user.country}
+                            </p>
+                          )}
                           {user.phone_number && (
                             <p className="text-sm text-gray-600 flex items-center">
                               <FiPhone className="h-4 w-4 mr-2" />

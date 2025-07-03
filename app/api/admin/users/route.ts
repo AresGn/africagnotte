@@ -35,18 +35,19 @@ export async function GET(request: NextRequest) {
         paramIndex++;
       }
 
-      if (status === 'active') {
-        conditions.push(`p.is_active = true`);
-      } else if (status === 'inactive') {
-        conditions.push(`p.is_active = false`);
-      }
+      // Note: is_active column doesn't exist in current schema
+      // if (status === 'active') {
+      //   conditions.push(`p.is_active = true`);
+      // } else if (status === 'inactive') {
+      //   conditions.push(`p.is_active = false`);
+      // }
 
       if (search) {
         conditions.push(`(
-          p.username ILIKE $${paramIndex} OR 
+          p.username ILIKE $${paramIndex} OR
           p.first_name ILIKE $${paramIndex} OR
           p.last_name ILIKE $${paramIndex} OR
-          p.email ILIKE $${paramIndex}
+          p.phone_number ILIKE $${paramIndex}
         )`);
         params.push(`%${search}%`);
         paramIndex++;
@@ -56,15 +57,14 @@ export async function GET(request: NextRequest) {
 
       // Requête principale pour récupérer les utilisateurs
       const usersQuery = `
-        SELECT 
+        SELECT
           p.id,
           p.username,
-          p.email,
           p.first_name,
           p.last_name,
           p.phone_number,
+          p.country,
           p.role,
-          p.is_active,
           p.created_at,
           p.updated_at,
           COUNT(c.id) as cagnottes_count,
@@ -72,8 +72,8 @@ export async function GET(request: NextRequest) {
         FROM profiles p
         LEFT JOIN cagnottes c ON p.id = c.user_id AND c.moderation_status = 'approved'
         ${whereClause}
-        GROUP BY p.id, p.username, p.email, p.first_name, p.last_name, 
-                 p.phone_number, p.role, p.is_active, p.created_at, p.updated_at
+        GROUP BY p.id, p.username, p.first_name, p.last_name,
+                 p.phone_number, p.country, p.role, p.created_at, p.updated_at
         ORDER BY p.created_at DESC
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
       `;
@@ -93,10 +93,10 @@ export async function GET(request: NextRequest) {
 
       // Statistiques générales
       const statsResult = await client.query(`
-        SELECT 
+        SELECT
           COUNT(*) as total_users,
-          COUNT(*) FILTER (WHERE is_active = true) as active_users,
-          COUNT(*) FILTER (WHERE is_active = false) as inactive_users,
+          COUNT(*) as active_users,
+          0 as inactive_users,
           COUNT(*) FILTER (WHERE role = 'user') as regular_users,
           COUNT(*) FILTER (WHERE role = 'moderator') as moderators,
           COUNT(*) FILTER (WHERE role = 'admin') as admins,
