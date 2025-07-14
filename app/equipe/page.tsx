@@ -51,7 +51,7 @@ export default function EquipePage() {
           role: "Développeuse Frontend",
           description: "Spécialiste UX/UI avec une expertise en accessibilité et design inclusif",
           avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-          location: "Abidjan, Côte d'Ivoire",
+          location: "Abidjan, Côte d&apos;Ivoire",
           social: {
             linkedin: "https://linkedin.com/in/fatima-ouattara",
             twitter: "https://twitter.com/fatima_dev",
@@ -62,7 +62,7 @@ export default function EquipePage() {
     },
     {
       title: "Coordinateurs",
-      description: "L'équipe qui coordonne les opérations et les partenariats",
+      description: "L&apos;équipe qui coordonne les opérations et les partenariats",
       members: [
         {
           id: "coord1",
@@ -93,13 +93,13 @@ export default function EquipePage() {
     },
     {
       title: "Modérateurs",
-      description: "L'équipe qui veille à la qualité et l'authenticité des cagnottes",
+      description: "L&apos;équipe qui veille à la qualité et l&apos;authenticité des cagnottes",
       members: [
         {
           id: "mod1",
           name: "Omar Benali",
           role: "Modérateur Principal",
-          description: "Vérification et validation des cagnottes, garantie de l'authenticité",
+          description: "Vérification et validation des cagnottes, garantie de l&apos;authenticité",
           avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
           location: "Casablanca, Maroc",
           social: {
@@ -123,7 +123,7 @@ export default function EquipePage() {
     },
     {
       title: "Administrateurs",
-      description: "L'équipe dirigeante qui définit la vision et la stratégie",
+      description: "L&apos;équipe dirigeante qui définit la vision et la stratégie",
       members: [
         {
           id: "admin1",
@@ -165,7 +165,7 @@ export default function EquipePage() {
             </h1>
             <p className="text-xl md:text-2xl leading-relaxed mb-8" style={{ color: 'var(--dark-color)' }}>
               Rencontrez les visages passionnés qui travaillent chaque jour pour faire 
-              d'AfricaGnotte la première plateforme de solidarité africaine
+              d&apos;AfricaGnotte la première plateforme de solidarité africaine
             </p>
             <div className="w-24 h-1 mx-auto rounded-full" style={{ backgroundColor: 'var(--primary-color)' }}></div>
           </div>
@@ -282,7 +282,7 @@ export default function EquipePage() {
             Rejoignez Notre Équipe
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Vous partagez notre vision d'une Afrique plus solidaire ? 
+            Vous partagez notre vision d&apos;une Afrique plus solidaire ?
             Nous recherchons constamment des talents passionnés pour nous rejoindre.
           </p>
           <a 

@@ -79,7 +79,7 @@ export default function CookieConsent({ onAccept, onDecline }: CookieConsentProp
               Qui refuse encore de bons cookies 🍪 en 2025 ?
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              Nous utilisons des cookies afin d'améliorer votre expérience de visite, 
+              Nous utilisons des cookies afin d&apos;améliorer votre expérience de visite,
               vous proposer des contenus personnalisés, développer nos services et 
               mesurer notre audience. Vous pouvez accepter ou refuser ces cookies.
             </p>

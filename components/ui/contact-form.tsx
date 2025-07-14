@@ -65,7 +65,7 @@ export const ContactForm = ({
           message: ''
         });
       }, 3000);
-    } catch (error) {
+    } catch {
       toast.error('Erreur lors de l\'envoi du message. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);

@@ -14,7 +14,7 @@ export default function NotreMissionPage() {
               Notre Mission
             </h1>
             <p className="text-xl md:text-2xl leading-relaxed mb-8" style={{ color: 'var(--dark-color)' }}>
-              Transformer l'Afrique par la solidarité et créer un impact durable 
+              Transformer l&apos;Afrique par la solidarité et créer un impact durable
               dans la vie des personnes les plus vulnérables
             </p>
             <div className="w-24 h-1 mx-auto rounded-full" style={{ backgroundColor: 'var(--primary-color)' }}></div>
@@ -31,9 +31,9 @@ export default function NotreMissionPage() {
                 Notre Vision
               </h2>
               <p className="text-lg leading-relaxed mb-6 text-gray-700">
-                Nous rêvons d'une Afrique où chaque personne en difficulté peut compter sur 
-                la solidarité de sa communauté. Une Afrique où la technologie rapproche les cœurs 
-                et où l'entraide transcende les frontières.
+                Nous rêvons d&apos;une Afrique où chaque personne en difficulté peut compter sur
+                la solidarité de sa communauté. Une Afrique où la technologie rapproche les cœurs
+                et où l&apos;entraide transcende les frontières.
               </p>
               <div className="flex items-center space-x-3 mb-4">
                 <Heart className="w-6 h-6" style={{ color: 'var(--primary-color)' }} />
@@ -67,7 +67,7 @@ export default function NotreMissionPage() {
                 </li>
                 <li className="flex items-start space-x-3">
                   <div className="w-2 h-2 rounded-full mt-2" style={{ backgroundColor: 'var(--primary-color)' }}></div>
-                  <span>Frais réduits pour maximiser l'impact</span>
+                  <span>Frais réduits pour maximiser l&apos;impact</span>
                 </li>
               </ul>
             </div>
@@ -100,11 +100,11 @@ export default function NotreMissionPage() {
                 <Target className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--dark-color)' }}>
-                Maximiser l'Impact
+                Maximiser l&apos;Impact
               </h3>
               <p className="text-gray-700">
                 Assurer que chaque don atteint directement les bénéficiaires avec un maximum 
-                de transparence et d'efficacité.
+                de transparence et d&apos;efficacité.
               </p>
             </div>
 
@@ -113,7 +113,7 @@ export default function NotreMissionPage() {
                 <Lightbulb className="w-8 h-8" style={{ color: 'var(--dark-color)' }} />
               </div>
               <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--dark-color)' }}>
-                Innover pour l'Afrique
+                Innover pour l&apos;Afrique
               </h3>
               <p className="text-gray-700">
                 Développer des solutions technologiques adaptées aux réalités africaines 
@@ -139,7 +139,7 @@ export default function NotreMissionPage() {
               },
               {
                 title: "Solidarité",
-                description: "L'entraide africaine au cœur de notre mission",
+                description: "L&apos;entraide africaine au cœur de notre mission",
                 icon: "🤝"
               },
               {
