@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaSearch, FaFilter, FaUsers, FaCalendarAlt } from 'react-icons/fa';
@@ -37,7 +38,10 @@ interface Cagnotte {
   created_at: string;
 }
 
-export default function RechercheCagnotte() {
+function RechercheCagnotteContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,8 +49,42 @@ export default function RechercheCagnotte() {
   const [allCagnottes, setAllCagnottes] = useState<Cagnotte[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const itemsPerPage = 4;
+
+  // Lire les paramètres URL et présélectionner la catégorie (seulement au premier chargement)
+  useEffect(() => {
+    if (!isInitialized) {
+      const categoryParams = searchParams.getAll('category');
+      if (categoryParams.length > 0) {
+        // Filtrer les catégories valides
+        const validCategories = categoryParams.filter(param =>
+          categories.some(cat => cat.name === param)
+        );
+        if (validCategories.length > 0) {
+          setSelectedCategories(validCategories);
+        }
+      }
+      setIsInitialized(true);
+    }
+  }, [searchParams, isInitialized]);
+
+  // Mettre à jour l'URL quand les filtres changent (sauf au premier chargement)
+  // Désactivé temporairement pour éviter les conflits
+  /*
+  useEffect(() => {
+    if (isInitialized) {
+      const params = new URLSearchParams();
+      if (selectedCategories.length > 0) {
+        params.set('category', selectedCategories[0]);
+      }
+
+      const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [selectedCategories, isInitialized, pathname, router]);
+  */
 
   // Charger toutes les cagnottes publiques au montage du composant
   useEffect(() => {
@@ -115,12 +153,26 @@ export default function RechercheCagnotte() {
 
   // Gestion des filtres par catégorie
   const toggleCategory = (category: string) => {
+    console.log('toggleCategory called with:', category);
+    console.log('Current selectedCategories:', selectedCategories);
+
     if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter(cat => cat !== category));
+      const newCategories = selectedCategories.filter(cat => cat !== category);
+      console.log('Removing category, new categories:', newCategories);
+      setSelectedCategories(newCategories);
     } else {
-      setSelectedCategories([...selectedCategories, category]);
+      const newCategories = [...selectedCategories, category];
+      console.log('Adding category, new categories:', newCategories);
+      setSelectedCategories(newCategories);
     }
     setCurrentPage(1); // Réinitialiser la pagination lors du changement de filtre
+  };
+
+  // Fonction pour réinitialiser les filtres
+  const resetFilters = () => {
+    console.log('resetFilters called');
+    setSelectedCategories([]);
+    setCurrentPage(1);
   };
 
   // Gestionnaire de recherche
@@ -190,7 +242,7 @@ export default function RechercheCagnotte() {
               {selectedCategories.length > 0 && (
                 <button
                   className="mt-4 text-amber-600 hover:text-amber-700 font-medium"
-                  onClick={() => setSelectedCategories([])}
+                  onClick={resetFilters}
                 >
                   Réinitialiser les filtres
                 </button>
@@ -224,7 +276,7 @@ export default function RechercheCagnotte() {
               {selectedCategories.length > 0 && (
                 <button
                   className="mt-4 text-amber-600 hover:text-amber-700 font-medium"
-                  onClick={() => setSelectedCategories([])}
+                  onClick={resetFilters}
                 >
                   Réinitialiser les filtres
                 </button>
@@ -257,7 +309,7 @@ export default function RechercheCagnotte() {
                 {selectedCategories.length > 0 && (
                   <button
                     className="text-amber-600 hover:text-amber-700 font-medium"
-                    onClick={() => setSelectedCategories([])}
+                    onClick={resetFilters}
                   >
                     Réinitialiser les filtres
                   </button>
@@ -374,5 +426,25 @@ export default function RechercheCagnotte() {
         </div>
       </div>
     </main>
+  );
+}
+
+// Composant principal avec Suspense
+export default function RechercheCagnotte() {
+  return (
+    <Suspense fallback={
+      <main className="pt-20 pb-10 bg-gray-50 min-h-screen">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center items-center h-64">
+            <div className="text-center">
+              <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Chargement...</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    }>
+      <RechercheCagnotteContent />
+    </Suspense>
   );
 }

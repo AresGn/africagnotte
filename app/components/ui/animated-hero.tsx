@@ -71,9 +71,11 @@ function Hero() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md justify-center">
-            <Button size="lg" className="gap-2 text-sm md:text-base px-4 py-2 md:px-6 md:py-3 w-full sm:w-auto" variant="outline" style={{ borderColor: 'var(--primary-color)', color: 'var(--dark-color)' }}>
-              Nous contacter <PhoneCall className="w-3 h-3 md:w-4 md:h-4" />
-            </Button>
+            <Link href="/contact" className="w-full sm:w-auto">
+              <Button size="lg" className="gap-2 text-sm md:text-base px-4 py-2 md:px-6 md:py-3 w-full" variant="outline" style={{ borderColor: 'var(--primary-color)', color: 'var(--dark-color)' }}>
+                Nous contacter <PhoneCall className="w-3 h-3 md:w-4 md:h-4" />
+              </Button>
+            </Link>
             <Link href="/creer" className="w-full sm:w-auto">
               <Button size="lg" className="gap-2 text-sm md:text-base px-4 py-2 md:px-6 md:py-3 w-full" style={{ backgroundColor: 'var(--primary-color)', color: 'white' }}>
                 Créer une cagnotte <MoveRight className="w-3 h-3 md:w-4 md:h-4" />

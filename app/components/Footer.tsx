@@ -40,7 +40,7 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Liens rapides</h3>
             <ul className="space-y-2">
-              <li><Link href="/pourquoi-africagnotte" className="hover:text-gray-300">Pourquoi AfriCagnotte?</Link></li>
+              <li><Link href="/notre-mission" className="hover:text-gray-300">Pourquoi AfriCagnotte?</Link></li>
               <li><Link href="/comment-ca-marche" className="hover:text-gray-300">Comment ça marche</Link></li>
               <li><Link href="/centre-assistance" className="hover:text-gray-300">Centre d&apos;assistance</Link></li>
               <li><Link href="/garanties-securite" className="hover:text-gray-300">Garanties et sécurité</Link></li>
@@ -49,19 +49,19 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Catégories</h3>
             <ul className="space-y-2">
-              <li><Link href="/category/sante" className="hover:text-gray-300">Santé</Link></li>
-              <li><Link href="/category/famille" className="hover:text-gray-300">Famille</Link></li>
-              <li><Link href="/category/education" className="hover:text-gray-300">Éducation</Link></li>
-              <li><Link href="/category/entrepreneuriat-social" className="hover:text-gray-300">Entrepreneuriat</Link></li>
-              <li><Link href="/category/acces-eau" className="hover:text-gray-300">Accès à l&apos;eau</Link></li>
-              <li><Link href="/category/environnement" className="hover:text-gray-300">Environnement</Link></li>
+              <li><Link href="/recherche?category=Santé" className="hover:text-gray-300">Santé</Link></li>
+              <li><Link href="/recherche?category=Famille" className="hover:text-gray-300">Famille</Link></li>
+              <li><Link href="/recherche?category=Éducation" className="hover:text-gray-300">Éducation</Link></li>
+              <li><Link href="/recherche?category=Entrepreneuriat Social" className="hover:text-gray-300">Entrepreneuriat</Link></li>
+              <li><Link href="/recherche?category=Accès à l'eau" className="hover:text-gray-300">Accès à l&apos;eau</Link></li>
+              <li><Link href="/recherche?category=Environnement" className="hover:text-gray-300">Environnement</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="text-lg font-bold mb-4">Contact</h3>
             <ul className="space-y-2">
               <li><Link href="/equipe" className="hover:text-gray-300">Équipe</Link></li>
-              <li><Link href="/nous-contacter" className="hover:text-gray-300">Nous contacter</Link></li>
+              <li><Link href="/contact" className="hover:text-gray-300">Nous contacter</Link></li>
               <li><Link href="/nous-recrutons" className="hover:text-gray-300">Nous recrutons</Link></li>
               <li>Email: contact@africagnotte.com</li>
               <li>Téléphone: +xxx xxx xxx xxx</li>

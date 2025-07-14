@@ -11,6 +11,28 @@
   --light-color: #FAF3E0; /* Sand/cream color */
   --error-color: #B81D13; /* Deep red */
   --success-color: #2E8B57; /* Forest green */
+
+  /* Shadcn variables */
+  --background: #FAF3E0;
+  --foreground: #472D2D;
+  --card: #ffffff;
+  --card-foreground: #472D2D;
+  --popover: #ffffff;
+  --popover-foreground: #472D2D;
+  --primary: #E57A44;
+  --primary-foreground: #ffffff;
+  --secondary: #5FA777;
+  --secondary-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #EFCB68;
+  --accent-foreground: #472D2D;
+  --destructive: #B81D13;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #E57A44;
+  --radius: 0.5rem;
 }
 
 body {
