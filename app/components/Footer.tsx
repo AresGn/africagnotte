@@ -60,6 +60,7 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Contact</h3>
             <ul className="space-y-2">
+              <li><Link href="/equipe" className="hover:text-gray-300">Équipe</Link></li>
               <li><Link href="/nous-contacter" className="hover:text-gray-300">Nous contacter</Link></li>
               <li><Link href="/nous-recrutons" className="hover:text-gray-300">Nous recrutons</Link></li>
               <li>Email: contact@africagnotte.com</li>

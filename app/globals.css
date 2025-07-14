@@ -189,10 +189,26 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Animation pour le composant CookieConsent */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
 /* Ajouter cette règle à la fin du fichier pour masquer l'overlay d'erreur Next.js */
 div[data-nextjs-dialog-overlay],
 div[data-nextjs-dialog],
 div[id="__nextjs-toast-wrapper"],
 .nextjs-portal {
   display: none !important;
-} 
+}

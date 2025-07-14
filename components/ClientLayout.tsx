@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
+import CookieConsent from './CookieConsent';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +11,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <main className="flex-grow">
           {children}
         </main>
+        <CookieConsent />
       </div>
     </AuthProvider>
   );
-} 
+}

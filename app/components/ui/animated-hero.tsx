@@ -29,9 +29,11 @@ function Hero() {
       <div className="container-custom">
         <div className="flex gap-6 py-16 md:py-24 lg:py-32 items-center justify-center flex-col">
           <div>
-            <Button variant="secondary" size="sm" className="gap-2 px-3 py-1 md:gap-4 md:px-4 md:py-2 text-xs md:text-sm" style={{ backgroundColor: 'var(--accent-color)', color: 'var(--dark-color)' }}>
-              Notre mission <MoveRight className="w-3 h-3 md:w-4 md:h-4" />
-            </Button>
+            <Link href="/notre-mission">
+              <Button variant="secondary" size="sm" className="gap-2 px-3 py-1 md:gap-4 md:px-4 md:py-2 text-xs md:text-sm" style={{ backgroundColor: 'var(--accent-color)', color: 'var(--dark-color)' }}>
+                Notre mission <MoveRight className="w-3 h-3 md:w-4 md:h-4" />
+              </Button>
+            </Link>
           </div>
           <div className="flex gap-3 md:gap-4 flex-col">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl max-w-2xl tracking-tighter text-center font-regular">
