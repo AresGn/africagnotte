@@ -97,7 +97,7 @@ export default function DonationForm({ cagnotteId, onDonationSuccess }: Donation
 
         <div>
           <label htmlFor="amount" className="block text-sm font-medium mb-2">
-            Montant du don (€) *
+            Montant du don (FCFA) *
           </label>
           <input
             type="number"

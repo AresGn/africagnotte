@@ -316,7 +316,7 @@ export default function ModifierCagnotte() {
 
               {showTarget && (
                 <div className="ml-6">
-                  <label htmlFor="targetAmount" className="block text-sm font-medium mb-1">Montant à atteindre (€)</label>
+                  <label htmlFor="targetAmount" className="block text-sm font-medium mb-1">Montant à atteindre (FCFA)</label>
                   <input
                     type="number"
                     id="targetAmount"

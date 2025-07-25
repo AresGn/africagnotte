@@ -105,6 +105,8 @@ export async function POST(request, { params }) {
       comment,
       is_anonymous = false,
       payment_reference,
+      payment_method,
+      payment_status = 'pending',
       donation_type = 'monetary',
       // Champs pour services
       service_type,
@@ -192,12 +194,12 @@ export async function POST(request, { params }) {
     // Créer le don avec support de la diversification
     const donationResult = await client.query(
       `INSERT INTO cagnotte_donations
-       (cagnotte_id, donor_name, amount, comment, is_anonymous, payment_reference, payment_status,
+       (cagnotte_id, donor_name, amount, comment, is_anonymous, payment_reference, payment_method, payment_status,
         donation_type, service_type, service_description, service_duration, service_availability,
         material_type, material_description, material_quantity, material_condition,
         skill_type, skill_description, skill_level, skill_availability,
         estimated_value, contact_info, delivery_method, location_constraint)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
        RETURNING *`,
       [
         cagnotteId,
@@ -206,7 +208,8 @@ export async function POST(request, { params }) {
         comment || null,
         is_anonymous,
         payment_reference || null,
-        'pending',
+        payment_method || null,
+        payment_status,
         donation_type,
         service_type || null,
         service_description || null,

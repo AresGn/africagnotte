@@ -270,7 +270,7 @@ export default function CreerCagnotte() {
                   onChange={(e) => setTargetAmount(parseInt(e.target.value) || null)}
                   required={showTarget}
                 />
-                <span className="ml-2 text-gray-700 font-medium">€</span>
+                <span className="ml-2 text-gray-700 font-medium">FCFA</span>
               </div>
             </div>
           )}

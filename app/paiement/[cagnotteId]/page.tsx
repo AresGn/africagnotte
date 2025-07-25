@@ -1,48 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast, Toaster } from 'react-hot-toast';
-import { FaArrowLeft, FaLock, FaHeart } from 'react-icons/fa';
+import { FaArrowLeft, FaLock, FaHeart, FaMobileAlt } from 'react-icons/fa';
 import { useCagnotte } from '../../../hooks/useCagnotte';
 import CagnotteSummary from '../../../components/CagnotteSummary';
+import CodeUSSDGenerator from '../../../components/CodeUSSDGenerator';
+import PreuvePaiementUpload from '../../../components/PreuvePaiementUpload';
+import { OPERATEURS_MOBILES, type OperateurMobile, type CodeUSSDGenere, genererReferencePaiement } from '../../../lib/paiement-service';
 
-// Types pour les méthodes de paiement
-interface PaymentMethod {
-  id: string;
-  name: string;
-  icon: string;
-  category: 'mobile' | 'card' | 'crypto' | 'wallet';
-  description: string;
-  countries?: string[];
-}
+// Types pour les étapes du paiement
+type EtapePaiement = 'selection' | 'code_ussd' | 'preuve' | 'confirmation';
 
-const paymentMethods: PaymentMethod[] = [
-  // Mobile Money Afrique
-  { id: 'orange_money', name: 'Orange Money', icon: '🟠', category: 'mobile', description: 'Côte d\'Ivoire, Mali, Sénégal', countries: ['CI', 'ML', 'SN'] },
-  { id: 'mtn_money', name: 'MTN Mobile Money', icon: '🟡', category: 'mobile', description: 'Ghana, Ouganda, Rwanda', countries: ['GH', 'UG', 'RW'] },
-  { id: 'airtel_money', name: 'Airtel Money', icon: '🔴', category: 'mobile', description: 'Kenya, Tanzania, Zambie', countries: ['KE', 'TZ', 'ZM'] },
-  { id: 'wave', name: 'Wave', icon: '💙', category: 'mobile', description: 'Sénégal, Côte d\'Ivoire', countries: ['SN', 'CI'] },
-  { id: 'moov_money', name: 'Moov Money', icon: '🟢', category: 'mobile', description: 'Bénin, Togo', countries: ['BJ', 'TG'] },
-  
-  // Paiements traditionnels
-  { id: 'visa', name: 'Visa', icon: '💳', category: 'card', description: 'Carte bancaire internationale' },
-  { id: 'mastercard', name: 'Mastercard', icon: '💳', category: 'card', description: 'Carte bancaire internationale' },
-  { id: 'paypal', name: 'PayPal', icon: '💰', category: 'wallet', description: 'Portefeuille électronique' },
-  
-  // Cryptomonnaies
-  { id: 'usdt', name: 'USDT (Tether)', icon: '💚', category: 'crypto', description: 'Stablecoin USD' },
-  { id: 'btc', name: 'Bitcoin (BTC)', icon: '₿', category: 'crypto', description: 'Cryptomonnaie' },
-  { id: 'eth', name: 'Ethereum (ETH)', icon: '⟠', category: 'crypto', description: 'Cryptomonnaie' },
-  { id: 'sol', name: 'Solana (SOL)', icon: '◎', category: 'crypto', description: 'Cryptomonnaie' },
-];
+// Configuration du bénéficiaire (à adapter selon vos besoins)
+const NUMERO_BENEFICIAIRE = process.env.NEXT_PUBLIC_NUMERO_BENEFICIAIRE || '97123456';
 
-const suggestedAmounts = [10, 25, 50, 100];
+const suggestedAmounts = [1000, 2500, 5000, 10000]; // Montants en FCFA
 
 export default function PaiementPage() {
   const params = useParams();
-  const router = useRouter();
   const cagnotteId = params?.cagnotteId as string;
   
   // États du formulaire
@@ -52,8 +30,13 @@ export default function PaiementPage() {
   const [customAmount, setCustomAmount] = useState('');
   const [message, setMessage] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
+  const [selectedOperateur, setSelectedOperateur] = useState<OperateurMobile | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // États pour le nouveau système de paiement
+  const [etapeActuelle, setEtapeActuelle] = useState<EtapePaiement>('selection');
+  const [codeGenere, setCodeGenere] = useState<CodeUSSDGenere | null>(null);
+  const [donationId, setDonationId] = useState<string | null>(null);
   
   // Charger les données de la cagnotte
   const { cagnotte, loading: cagnotteLoading, error: cagnotteError } = useCagnotte(cagnotteId || '');
@@ -99,21 +82,24 @@ export default function PaiementPage() {
       return;
     }
     
-    if (!selectedPaymentMethod) {
-      toast.error('Veuillez choisir une méthode de paiement');
+    if (!selectedOperateur) {
+      toast.error('Veuillez choisir un opérateur mobile');
       return;
     }
 
     try {
       setLoading(true);
       
-      // Créer le don
+      // Créer le don avec le nouveau système
+      const paymentReference = genererReferencePaiement(selectedOperateur.id);
       const donationData = {
         donor_name: fullName.trim(),
         amount: Number(amount),
         comment: message.trim() || null,
         is_anonymous: isAnonymous,
-        payment_reference: `${selectedPaymentMethod}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        payment_reference: paymentReference,
+        payment_method: selectedOperateur.id,
+        payment_status: 'pending'
       };
 
       const response = await fetch(`/api/cagnottes/${cagnotteId}/donations`, {
@@ -130,20 +116,63 @@ export default function PaiementPage() {
         throw new Error(result.error || 'Erreur lors de la création du don');
       }
 
-      toast.success('Don créé avec succès ! Redirection vers le paiement...');
-      
-      // Simuler la redirection vers le processeur de paiement
-      setTimeout(() => {
-        // Ici, vous intégreriez les vraies APIs de paiement
-        toast.success('Paiement simulé avec succès !');
-        router.push(`/c/${cagnotte?.custom_url || cagnotteId}?success=true`);
-      }, 2000);
+      // Stocker l'ID de la donation et passer à l'étape suivante
+      setDonationId(result.donation.id);
+      toast.success('Don créé avec succès ! Génération du code de paiement...');
+      setEtapeActuelle('code_ussd');
 
     } catch (error) {
       console.error('Erreur lors de la création du don:', error);
       toast.error(error instanceof Error ? error.message : 'Une erreur est survenue');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Gestion du code USSD généré
+  const handleCodeGenere = (code: CodeUSSDGenere) => {
+    setCodeGenere(code);
+  };
+
+  // Passage à l'étape de preuve de paiement
+  const passerAPreuve = () => {
+    setEtapeActuelle('preuve');
+  };
+
+  // Gestion de l'upload de preuve
+  const handlePreuveUpload = async (urlImage: string) => {
+
+    try {
+      // Mettre à jour la donation avec la preuve de paiement
+      const response = await fetch(`/api/cagnottes/${cagnotteId}/donations/${donationId}/preuve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          proof_image_url: urlImage,
+          payment_status: 'proof_uploaded'
+        })
+      });
+
+      if (response.ok) {
+        setEtapeActuelle('confirmation');
+        toast.success('Preuve de paiement enregistrée ! Votre don sera vérifié sous peu.');
+      } else {
+        throw new Error('Erreur lors de l\'enregistrement de la preuve');
+      }
+    } catch (error) {
+      toast.error('Erreur lors de l\'enregistrement de la preuve');
+      console.error(error);
+    }
+  };
+
+  // Retour à l'étape précédente
+  const retourEtapePrecedente = () => {
+    if (etapeActuelle === 'code_ussd') {
+      setEtapeActuelle('selection');
+    } else if (etapeActuelle === 'preuve') {
+      setEtapeActuelle('code_ussd');
     }
   };
 
@@ -208,7 +237,31 @@ export default function PaiementPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+        {/* Indicateur d'étapes */}
+        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className={`flex items-center ${etapeActuelle === 'selection' ? 'text-lime-600' : etapeActuelle === 'code_ussd' || etapeActuelle === 'preuve' || etapeActuelle === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${etapeActuelle === 'selection' ? 'bg-lime-100' : etapeActuelle === 'code_ussd' || etapeActuelle === 'preuve' || etapeActuelle === 'confirmation' ? 'bg-green-100' : 'bg-gray-100'}`}>1</div>
+              <span className="ml-2 font-medium">Informations</span>
+            </div>
+            <div className={`flex items-center ${etapeActuelle === 'code_ussd' ? 'text-lime-600' : etapeActuelle === 'preuve' || etapeActuelle === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${etapeActuelle === 'code_ussd' ? 'bg-lime-100' : etapeActuelle === 'preuve' || etapeActuelle === 'confirmation' ? 'bg-green-100' : 'bg-gray-100'}`}>2</div>
+              <span className="ml-2 font-medium">Code USSD</span>
+            </div>
+            <div className={`flex items-center ${etapeActuelle === 'preuve' ? 'text-lime-600' : etapeActuelle === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${etapeActuelle === 'preuve' ? 'bg-lime-100' : etapeActuelle === 'confirmation' ? 'bg-green-100' : 'bg-gray-100'}`}>3</div>
+              <span className="ml-2 font-medium">Preuve</span>
+            </div>
+            <div className={`flex items-center ${etapeActuelle === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${etapeActuelle === 'confirmation' ? 'bg-green-100' : 'bg-gray-100'}`}>4</div>
+              <span className="ml-2 font-medium">Confirmation</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Étape 1: Sélection et informations */}
+        {etapeActuelle === 'selection' && (
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
           {/* Montant de participation */}
           <div className="mb-6">
             <label className="block text-lg font-semibold mb-4">Montant de votre participation :</label>
@@ -226,7 +279,7 @@ export default function PaiementPage() {
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                 >
-                  {suggestedAmount}€
+                  {suggestedAmount.toLocaleString()} FCFA
                 </button>
               ))}
             </div>
@@ -242,7 +295,7 @@ export default function PaiementPage() {
                 onChange={(e) => handleCustomAmountChange(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-500 text-center text-2xl font-bold"
               />
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xl">€</span>
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xl">FCFA</span>
             </div>
           </div>
 
@@ -294,100 +347,57 @@ export default function PaiementPage() {
             </label>
           </div>
 
-          {/* Méthodes de paiement */}
+          {/* Sélection d'opérateur mobile */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">Mode de paiement :</h3>
-            
-            {/* Mobile Money */}
-            <div className="mb-4">
-              <h4 className="font-medium text-gray-700 mb-2">💱 Mobile Money Afrique</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {paymentMethods.filter(method => method.category === 'mobile').map((method) => (
-                  <button
-                    key={method.id}
-                    type="button"
-                    onClick={() => setSelectedPaymentMethod(method.id)}
-                    className={`p-3 border-2 rounded-lg text-left transition-colors ${
-                      selectedPaymentMethod === method.id
-                        ? 'border-lime-500 bg-lime-50'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <span className="text-2xl mr-3">{method.icon}</span>
-                      <div>
-                        <div className="font-medium">{method.name}</div>
-                        <div className="text-sm text-gray-500">{method.description}</div>
-                      </div>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <FaMobileAlt className="text-lime-600" />
+              Choisissez votre opérateur mobile :
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {OPERATEURS_MOBILES.map((operateur) => (
+                <button
+                  key={operateur.id}
+                  type="button"
+                  onClick={() => setSelectedOperateur(operateur)}
+                  className={`p-4 border-2 rounded-lg text-left transition-all duration-200 ${
+                    selectedOperateur?.id === operateur.id
+                      ? 'border-lime-500 bg-lime-50 shadow-md'
+                      : 'border-gray-300 hover:border-gray-400 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <span className="text-3xl mr-3">{operateur.icone}</span>
+                    <div>
+                      <div className="font-medium text-gray-800">{operateur.nom}</div>
+                      <div className="text-sm text-gray-500">{operateur.description}</div>
                     </div>
-                  </button>
-                ))}
-              </div>
+                  </div>
+                </button>
+              ))}
             </div>
 
-            {/* Cartes et PayPal */}
-            <div className="mb-4">
-              <h4 className="font-medium text-gray-700 mb-2">💳 Cartes bancaires & Portefeuilles</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {paymentMethods.filter(method => method.category === 'card' || method.category === 'wallet').map((method) => (
-                  <button
-                    key={method.id}
-                    type="button"
-                    onClick={() => setSelectedPaymentMethod(method.id)}
-                    className={`p-3 border-2 rounded-lg text-left transition-colors ${
-                      selectedPaymentMethod === method.id
-                        ? 'border-lime-500 bg-lime-50'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <span className="text-2xl mr-3">{method.icon}</span>
-                      <div>
-                        <div className="font-medium">{method.name}</div>
-                        <div className="text-sm text-gray-500">{method.description}</div>
-                      </div>
-                    </div>
-                  </button>
-                ))}
+            {selectedOperateur && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">{selectedOperateur.icone}</span>
+                  <span className="font-medium text-blue-800">{selectedOperateur.nom} sélectionné</span>
+                </div>
+                <p className="text-sm text-blue-700">
+                  Un code USSD sera généré pour effectuer le transfert directement depuis votre téléphone.
+                </p>
               </div>
-            </div>
-
-            {/* Cryptomonnaies */}
-            <div className="mb-4">
-              <h4 className="font-medium text-gray-700 mb-2">₿ Cryptomonnaies</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {paymentMethods.filter(method => method.category === 'crypto').map((method) => (
-                  <button
-                    key={method.id}
-                    type="button"
-                    onClick={() => setSelectedPaymentMethod(method.id)}
-                    className={`p-3 border-2 rounded-lg text-left transition-colors ${
-                      selectedPaymentMethod === method.id
-                        ? 'border-lime-500 bg-lime-50'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <span className="text-2xl mr-3">{method.icon}</span>
-                      <div>
-                        <div className="font-medium">{method.name}</div>
-                        <div className="text-sm text-gray-500">{method.description}</div>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Bouton de validation */}
           <button
             type="submit"
-            disabled={loading || !amount || !selectedPaymentMethod}
+            disabled={loading || !amount || !selectedOperateur}
             className="w-full bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             <FaHeart className="text-lg" />
-            {loading ? 'Traitement en cours...' : `Valider et payer ${amount}€`}
+            {loading ? 'Traitement en cours...' : `Continuer - ${amount ? `${Number(amount).toLocaleString()} FCFA` : 'Sélectionner un montant'}`}
           </button>
 
           {/* Informations légales */}
@@ -405,6 +415,80 @@ export default function PaiementPage() {
             </p>
           </div>
         </form>
+        )}
+
+        {/* Étape 2: Génération du code USSD */}
+        {etapeActuelle === 'code_ussd' && selectedOperateur && amount && (
+          <div className="space-y-6">
+            <CodeUSSDGenerator
+              operateur={selectedOperateur}
+              beneficiaire={NUMERO_BENEFICIAIRE}
+              montant={Number(amount)}
+              onCodeGenere={handleCodeGenere}
+            />
+
+            {codeGenere && (
+              <div className="flex gap-3">
+                <button
+                  onClick={retourEtapePrecedente}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors"
+                >
+                  Retour
+                </button>
+                <button
+                  onClick={passerAPreuve}
+                  className="flex-1 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200"
+                >
+                  J&apos;ai effectué le transfert
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Étape 3: Upload de preuve de paiement */}
+        {etapeActuelle === 'preuve' && (
+          <PreuvePaiementUpload
+            montant={Number(amount)}
+            operateur={selectedOperateur?.nom || ''}
+            onPreuveUpload={handlePreuveUpload}
+            onAnnuler={retourEtapePrecedente}
+          />
+        )}
+
+        {/* Étape 4: Confirmation */}
+        {etapeActuelle === 'confirmation' && (
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-2xl font-bold text-green-600 mb-4">Don enregistré avec succès !</h2>
+            <p className="text-gray-600 mb-6">
+              Votre don de <strong>{Number(amount).toLocaleString()} FCFA</strong> a été enregistré.
+              Notre équipe vérifiera votre preuve de paiement et validera votre contribution sous peu.
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-blue-700">
+                <strong>Prochaines étapes :</strong><br />
+                • Vérification de votre preuve de paiement (sous 24h)<br />
+                • Validation de votre don<br />
+                • Notification par email de la confirmation
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Link
+                href={`/c/${cagnotte?.custom_url || cagnotteId}`}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors text-center"
+              >
+                Retour à la cagnotte
+              </Link>
+              <Link
+                href="/recherche"
+                className="flex-1 bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 text-center"
+              >
+                Découvrir d&apos;autres cagnottes
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
