@@ -38,11 +38,13 @@ export async function middleware(request: NextRequest) {
   // Vérifier si la route est publique
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
-  // Pour les routes de donations et actualités, seul GET est public
-  const isDonationsOrActualitesGet = (pathname.includes('/donations') || pathname.includes('/actualites')) && request.method === 'GET';
+  // Pour les routes de donations : GET et POST sont publics (dons sans compte)
+  // Pour les actualités : seul GET est public
+  const isDonationsPublic = pathname.includes('/donations') && (request.method === 'GET' || request.method === 'POST');
+  const isActualitesGet = pathname.includes('/actualites') && request.method === 'GET';
 
-  if (isPublicRoute || isDonationsOrActualitesGet) {
-    console.log(`[Middleware] Public route accessed: ${pathname}`);
+  if (isPublicRoute || isDonationsPublic || isActualitesGet) {
+    console.log(`[Middleware] Public route accessed: ${pathname} (${request.method})`);
     return NextResponse.next();
   }
 

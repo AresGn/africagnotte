@@ -14,8 +14,7 @@ import { OPERATEURS_MOBILES, type OperateurMobile, type CodeUSSDGenere, genererR
 // Types pour les étapes du paiement
 type EtapePaiement = 'selection' | 'code_ussd' | 'preuve' | 'confirmation';
 
-// Configuration du bénéficiaire (à adapter selon vos besoins)
-const NUMERO_BENEFICIAIRE = process.env.NEXT_PUBLIC_NUMERO_BENEFICIAIRE || '97123456';
+// Les numéros de bénéficiaire seront récupérés depuis la cagnotte
 
 const suggestedAmounts = [1000, 2500, 5000, 10000]; // Montants en FCFA
 
@@ -84,6 +83,13 @@ export default function PaiementPage() {
     
     if (!selectedOperateur) {
       toast.error('Veuillez choisir un opérateur mobile');
+      return;
+    }
+
+    // Vérifier qu'un numéro de dépôt est disponible pour cet opérateur
+    const numeroBeneficiaire = obtenirNumeroBeneficiaire(selectedOperateur.id);
+    if (!numeroBeneficiaire || numeroBeneficiaire.trim() === '') {
+      toast.error('Aucun numéro de dépôt configuré pour cet opérateur');
       return;
     }
 
@@ -175,6 +181,71 @@ export default function PaiementPage() {
       setEtapeActuelle('code_ussd');
     }
   };
+
+  // Obtenir le numéro de bénéficiaire selon l'opérateur sélectionné
+  const obtenirNumeroBeneficiaire = (operateurId: string): string => {
+    if (!cagnotte) return '';
+
+    // Mapping des opérateurs vers les champs de la cagnotte
+    const operateurMapping: Record<string, string> = {
+      // Moov Money
+      'moov_benin': cagnotte.numero_moov || '',
+      'moov_burkina': cagnotte.numero_moov || '',
+      'moov_togo': cagnotte.numero_moov || '',
+      'moov_ci': cagnotte.numero_moov || '',
+
+      // MTN Mobile Money
+      'mtn_benin': cagnotte.numero_mtn || '',
+      'mtn_cameroun': cagnotte.numero_mtn || '',
+      'mtn_congo': cagnotte.numero_mtn || '',
+      'mtn_ci': cagnotte.numero_mtn || '',
+      'mtn_ghana': cagnotte.numero_mtn || '',
+      'mtn_uganda': cagnotte.numero_mtn || '',
+      'mtn_rwanda': cagnotte.numero_mtn || '',
+      'mtn_zambia': cagnotte.numero_mtn || '',
+
+      // Orange Money
+      'orange_senegal': cagnotte.numero_orange || '',
+      'orange_mali': cagnotte.numero_orange || '',
+      'orange_ci': cagnotte.numero_orange || '',
+      'orange_cameroun': cagnotte.numero_orange || '',
+      'orange_burkina': cagnotte.numero_orange || '',
+      'orange_niger': cagnotte.numero_orange || '',
+      'orange_madagascar': cagnotte.numero_orange || '',
+
+      // Wave
+      'wave_senegal': cagnotte.numero_wave || '',
+      'wave_ci': cagnotte.numero_wave || '',
+
+      // Airtel Money
+      'airtel_niger': cagnotte.numero_airtel || '',
+      'airtel_madagascar': cagnotte.numero_airtel || '',
+      'airtel_kenya': cagnotte.numero_airtel || '',
+      'airtel_tanzania': cagnotte.numero_airtel || '',
+      'airtel_uganda': cagnotte.numero_airtel || '',
+      'airtel_rwanda': cagnotte.numero_airtel || '',
+      'airtel_zambia': cagnotte.numero_airtel || '',
+      'airtel_malawi': cagnotte.numero_airtel || '',
+
+      // Autres opérateurs
+      'mpesa_kenya': cagnotte.numero_autres || '',
+      'free_senegal': cagnotte.numero_autres || '',
+      'expresso_senegal': cagnotte.numero_autres || '',
+      'tigo_tanzania': cagnotte.numero_autres || '',
+      'tigo_ghana': cagnotte.numero_autres || '',
+      'tigo_rwanda': cagnotte.numero_autres || '',
+      'vodacom_tanzania': cagnotte.numero_autres || '',
+      'vodacom_drc': cagnotte.numero_autres || '',
+    };
+
+    return operateurMapping[operateurId] || '';
+  };
+
+  // Filtrer les opérateurs disponibles selon les numéros renseignés
+  const operateursDisponibles = OPERATEURS_MOBILES.filter(operateur => {
+    const numero = obtenirNumeroBeneficiaire(operateur.id);
+    return numero && numero.trim() !== '';
+  });
 
   if (cagnotteLoading) {
     return (
@@ -354,8 +425,16 @@ export default function PaiementPage() {
               Choisissez votre opérateur mobile :
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {OPERATEURS_MOBILES.map((operateur) => (
+            {operateursDisponibles.length === 0 ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-700 text-center">
+                  <strong>Aucun opérateur disponible</strong><br />
+                  Le créateur de cette cagnotte n&apos;a pas encore configuré de numéros de dépôt.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {operateursDisponibles.map((operateur) => (
                 <button
                   key={operateur.id}
                   type="button"
@@ -375,7 +454,8 @@ export default function PaiementPage() {
                   </div>
                 </button>
               ))}
-            </div>
+              </div>
+            )}
 
             {selectedOperateur && (
               <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -422,7 +502,7 @@ export default function PaiementPage() {
           <div className="space-y-6">
             <CodeUSSDGenerator
               operateur={selectedOperateur}
-              beneficiaire={NUMERO_BENEFICIAIRE}
+              beneficiaire={obtenirNumeroBeneficiaire(selectedOperateur.id)}
               montant={Number(amount)}
               onCodeGenere={handleCodeGenere}
             />

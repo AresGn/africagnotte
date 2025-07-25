@@ -33,6 +33,14 @@ export default function CreerCagnotte() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
   const [hideAmount, setHideAmount] = useState(false);
   const [showParticipants, setShowParticipants] = useState(true);
+
+  // Numéros de dépôt pour les différents opérateurs
+  const [numeroMoov, setNumeroMoov] = useState('');
+  const [numeroMtn, setNumeroMtn] = useState('');
+  const [numeroOrange, setNumeroOrange] = useState('');
+  const [numeroWave, setNumeroWave] = useState('');
+  const [numeroAirtel, setNumeroAirtel] = useState('');
+  const [numeroAutres, setNumeroAutres] = useState('');
   const [description, setDescription] = useState('Quel que soit le montant, chacun peut participer à cette cagnotte. Pas besoin de créer un compte ou de s&apos;inscrire, c&apos;est rapide et les paiements par Carte Bancaire sont 100% sécurisés.\n\nSi vous ne pouvez pas participer financièrement, partagez cette cagnotte autour de vous au maximum. MERCI !');
   const [longDescription, setLongDescription] = useState('');
   const [authorName, setAuthorName] = useState('');
@@ -81,6 +89,13 @@ export default function CreerCagnotte() {
       toast.error('Veuillez définir un montant à atteindre valide');
       return;
     }
+
+    // Validation des numéros de dépôt (au moins un requis)
+    const numerosDepot = [numeroMoov, numeroMtn, numeroOrange, numeroWave, numeroAirtel, numeroAutres].filter(num => num.trim());
+    if (numerosDepot.length === 0) {
+      toast.error('Veuillez renseigner au moins un numéro de dépôt pour recevoir les dons');
+      return;
+    }
     
     try {
       setLoading(true);
@@ -102,6 +117,13 @@ export default function CreerCagnotte() {
         target_amount: showTarget ? targetAmount : null,
         hide_amount: hideAmount,
         show_participants: showParticipants,
+        // Numéros de dépôt pour les différents opérateurs
+        numero_moov: numeroMoov.trim() || null,
+        numero_mtn: numeroMtn.trim() || null,
+        numero_orange: numeroOrange.trim() || null,
+        numero_wave: numeroWave.trim() || null,
+        numero_airtel: numeroAirtel.trim() || null,
+        numero_autres: numeroAutres.trim() || null,
       };
       
       const response = await fetch('/api/cagnottes', {
@@ -274,7 +296,121 @@ export default function CreerCagnotte() {
               </div>
             </div>
           )}
-          
+
+          {/* Numéros de dépôt pour les paiements */}
+          <div className="mb-5 sm:mb-6">
+            <label className="block text-base sm:text-lg font-semibold mb-3">Numéros de dépôt pour recevoir les dons</label>
+            <p className="text-sm text-gray-600 mb-4">
+              Renseignez vos numéros de téléphone pour les différents opérateurs mobiles.
+              <strong> Au moins un numéro est requis.</strong>
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Moov Money */}
+              <div>
+                <label htmlFor="numeroMoov" className="block text-sm font-medium mb-1 flex items-center">
+                  <span className="text-orange-500 mr-2">🟠</span>
+                  Moov Money
+                </label>
+                <input
+                  type="tel"
+                  id="numeroMoov"
+                  placeholder="Ex: 97123456"
+                  value={numeroMoov}
+                  onChange={(e) => setNumeroMoov(e.target.value)}
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                />
+              </div>
+
+              {/* MTN Mobile Money */}
+              <div>
+                <label htmlFor="numeroMtn" className="block text-sm font-medium mb-1 flex items-center">
+                  <span className="text-yellow-500 mr-2">🟡</span>
+                  MTN Mobile Money
+                </label>
+                <input
+                  type="tel"
+                  id="numeroMtn"
+                  placeholder="Ex: 96123456"
+                  value={numeroMtn}
+                  onChange={(e) => setNumeroMtn(e.target.value)}
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                />
+              </div>
+
+              {/* Orange Money */}
+              <div>
+                <label htmlFor="numeroOrange" className="block text-sm font-medium mb-1 flex items-center">
+                  <span className="text-orange-600 mr-2">🟠</span>
+                  Orange Money
+                </label>
+                <input
+                  type="tel"
+                  id="numeroOrange"
+                  placeholder="Ex: 77123456"
+                  value={numeroOrange}
+                  onChange={(e) => setNumeroOrange(e.target.value)}
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                />
+              </div>
+
+              {/* Wave */}
+              <div>
+                <label htmlFor="numeroWave" className="block text-sm font-medium mb-1 flex items-center">
+                  <span className="text-blue-500 mr-2">💙</span>
+                  Wave
+                </label>
+                <input
+                  type="tel"
+                  id="numeroWave"
+                  placeholder="Ex: 77123456"
+                  value={numeroWave}
+                  onChange={(e) => setNumeroWave(e.target.value)}
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                />
+              </div>
+
+              {/* Airtel Money */}
+              <div>
+                <label htmlFor="numeroAirtel" className="block text-sm font-medium mb-1 flex items-center">
+                  <span className="text-red-500 mr-2">🔴</span>
+                  Airtel Money
+                </label>
+                <input
+                  type="tel"
+                  id="numeroAirtel"
+                  placeholder="Ex: 95123456"
+                  value={numeroAirtel}
+                  onChange={(e) => setNumeroAirtel(e.target.value)}
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                />
+              </div>
+
+              {/* Autres opérateurs */}
+              <div>
+                <label htmlFor="numeroAutres" className="block text-sm font-medium mb-1 flex items-center">
+                  <span className="text-gray-500 mr-2">📱</span>
+                  Autres opérateurs
+                </label>
+                <input
+                  type="tel"
+                  id="numeroAutres"
+                  placeholder="Ex: 70123456"
+                  value={numeroAutres}
+                  onChange={(e) => setNumeroAutres(e.target.value)}
+                  className="w-full p-2 sm:p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                />
+              </div>
+            </div>
+
+            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">
+                <strong>💡 Conseil :</strong> Renseignez plusieurs numéros pour offrir plus d&apos;options de paiement aux donateurs.
+                Les numéros doivent être actifs et appartenir au créateur de la cagnotte.
+              </p>
+            </div>
+          </div>
+
           <div className="mb-5 sm:mb-6">
             <label htmlFor="description" className="block text-base sm:text-lg font-semibold mb-2">Description</label>
             <div className="mb-2 flex space-x-2 border-b pb-2">

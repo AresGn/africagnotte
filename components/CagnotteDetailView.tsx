@@ -57,6 +57,13 @@ export interface CagnotteDetailData {
   donations?: CagnotteDonation[];
   actualites?: CagnotteActualite[];
   custom_url?: string | null;
+  // Numéros de dépôt pour les différents opérateurs mobiles
+  numero_moov?: string | null;
+  numero_mtn?: string | null;
+  numero_orange?: string | null;
+  numero_wave?: string | null;
+  numero_airtel?: string | null;
+  numero_autres?: string | null;
 }
 
 interface CagnotteDetailViewProps {

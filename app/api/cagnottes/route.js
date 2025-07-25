@@ -54,7 +54,14 @@ export async function POST(request) {
       show_target,
       target_amount,
       hide_amount,
-      show_participants
+      show_participants,
+      // Numéros de dépôt pour les différents opérateurs
+      numero_moov,
+      numero_mtn,
+      numero_orange,
+      numero_wave,
+      numero_airtel,
+      numero_autres
     } = body;
 
     // Validation basique (peut être étendue)
@@ -62,9 +69,15 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Les champs titre, catégorie et description sont requis.' }, { status: 400 });
     }
 
+    // Validation des numéros de dépôt (au moins un requis)
+    const numerosDepot = [numero_moov, numero_mtn, numero_orange, numero_wave, numero_airtel, numero_autres].filter(num => num && num.trim());
+    if (numerosDepot.length === 0) {
+      return NextResponse.json({ error: 'Au moins un numéro de dépôt est requis pour recevoir les dons.' }, { status: 400 });
+    }
+
     const client = await pool.connect();
     const result = await client.query(
-      'INSERT INTO cagnottes (user_id, title, custom_url, category, description, long_description, author_name, author_phone, author_socials, images, video, is_private, show_target, target_amount, hide_amount, show_participants, status, moderation_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *',
+      'INSERT INTO cagnottes (user_id, title, custom_url, category, description, long_description, author_name, author_phone, author_socials, images, video, is_private, show_target, target_amount, hide_amount, show_participants, numero_moov, numero_mtn, numero_orange, numero_wave, numero_airtel, numero_autres, status, moderation_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24) RETURNING *',
       [
         userId,
         title,
@@ -82,6 +95,12 @@ export async function POST(request) {
         target_amount || null,
         hide_amount || false,
         show_participants !== undefined ? show_participants : true, // Valeur par défaut si non fournie
+        numero_moov || null,
+        numero_mtn || null,
+        numero_orange || null,
+        numero_wave || null,
+        numero_airtel || null,
+        numero_autres || null,
         'active', // Statut par défaut lors de la création
         'pending' // Statut de modération par défaut - doit être approuvé par un admin
       ]
