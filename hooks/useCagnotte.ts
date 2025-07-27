@@ -40,6 +40,13 @@ export function useCagnotte(slugOrId: string): UseCagnotteResult {
         createdAt: data.created_at ? new Date(data.created_at) : new Date(),
         participants: data.participants_count,
         isEnded: data.status === 'closed',
+        // Numéros de dépôt pour les différents opérateurs
+        numero_moov: data.numero_moov,
+        numero_mtn: data.numero_mtn,
+        numero_orange: data.numero_orange,
+        numero_wave: data.numero_wave,
+        numero_airtel: data.numero_airtel,
+        numero_autres: data.numero_autres,
         // Transformer les donations pour correspondre au format attendu
         donations: (data.donations || []).map((donation: any) => ({
           ...donation,

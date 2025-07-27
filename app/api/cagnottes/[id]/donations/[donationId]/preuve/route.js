@@ -12,7 +12,7 @@ const pool = new Pool({
  * Ajouter une preuve de paiement à une donation
  */
 export async function POST(request, { params }) {
-  const { id: cagnotteId, donationId } = params;
+  const { id: cagnotteId, donationId } = await params;
 
   try {
     const body = await request.json();
@@ -69,7 +69,7 @@ export async function POST(request, { params }) {
            updated_at = NOW()
        WHERE id = $3 AND cagnotte_id = $4
        RETURNING *`,
-      [proof_image_url, payment_status, donationId, cagnotteId]
+      [proof_image_url, payment_status || 'pending', donationId, cagnotteId]
     );
 
     client.release();

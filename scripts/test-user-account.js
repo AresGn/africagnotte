@@ -27,8 +27,8 @@ async function createTestAccount() {
     
     // Vérifier si le compte existe déjà
     const existingUser = await client.query(
-      'SELECT id FROM profiles WHERE username = $1 OR email = $2',
-      [testAccount.username, testAccount.email]
+      'SELECT id FROM profiles WHERE username = $1',
+      [testAccount.username]
     );
     
     if (existingUser.rows.length > 0) {

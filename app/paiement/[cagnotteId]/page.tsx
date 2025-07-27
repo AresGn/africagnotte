@@ -40,6 +40,8 @@ export default function PaiementPage() {
   // Charger les données de la cagnotte
   const { cagnotte, loading: cagnotteLoading, error: cagnotteError } = useCagnotte(cagnotteId || '');
 
+
+
   // Validation email
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -157,7 +159,7 @@ export default function PaiementPage() {
         },
         body: JSON.stringify({
           proof_image_url: urlImage,
-          payment_status: 'proof_uploaded'
+          payment_status: 'pending'
         })
       });
 

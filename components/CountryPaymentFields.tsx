@@ -113,7 +113,7 @@ export default function CountryPaymentFields({
         <p className="text-sm text-blue-700 mt-1">
           Les opérateurs disponibles dans votre pays sont affichés ci-dessous.
           {requiredOperators.length > 0 && (
-            <span className="font-medium"> Les champs marqués d'un * sont obligatoires.</span>
+            <span className="font-medium"> Les champs marqués d&apos;un * sont obligatoires.</span>
           )}
         </p>
       </div>
@@ -166,8 +166,8 @@ export default function CountryPaymentFields({
       {/* Message d'aide */}
       <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
         <p className="text-xs text-gray-600">
-          <strong>💡 Conseil :</strong> Renseignez plusieurs numéros pour permettre aux donateurs 
-          d'utiliser leur opérateur préféré. Les numéros peuvent être au format local ou international.
+          <strong>💡 Conseil :</strong> Renseignez plusieurs numéros pour permettre aux donateurs
+          d&apos;utiliser leur opérateur préféré. Les numéros peuvent être au format local ou international.
         </p>
       </div>
     </div>

@@ -5,14 +5,20 @@ import { useRouter } from 'next/navigation';
 
 // Pays utilisant le XOF (Union Économique et Monétaire Ouest-Africaine)
 const XOF_COUNTRIES = [
-  'Bénin', 'Burkina Faso', 'Côte d\'Ivoire', 'Guinée-Bissau', 
+  'Bénin', 'Burkina Faso', 'Côte d\'Ivoire', 'Guinée-Bissau',
   'Mali', 'Niger', 'Sénégal', 'Togo'
 ];
 
 // Pays utilisant le XAF (Communauté Économique et Monétaire de l'Afrique Centrale)
 const XAF_COUNTRIES = [
-  'Cameroun', 'République centrafricaine', 'Tchad', 
+  'Cameroun', 'République centrafricaine', 'Tchad',
   'République du Congo', 'Guinée équatoriale', 'Gabon'
+];
+
+// Autres pays africains avec mobile money
+const OTHER_AFRICAN_COUNTRIES = [
+  'République démocratique du Congo', 'Kenya', 'Ghana', 'Ouganda',
+  'Rwanda', 'Tanzanie', 'Zambie', 'Madagascar', 'Malawi'
 ];
 
 export default function RegisterForm() {
@@ -199,13 +205,18 @@ export default function RegisterForm() {
             style={{ '--tw-ring-color': 'var(--primary-color)' } as React.CSSProperties}
           >
             <option value="">Sélectionnez votre pays</option>
-            <optgroup label="Zone XOF">
+            <optgroup label="Zone XOF (Franc CFA Ouest-Africain)">
               {XOF_COUNTRIES.map(country => (
                 <option key={country} value={country}>{country}</option>
               ))}
             </optgroup>
-            <optgroup label="Zone XAF">
+            <optgroup label="Zone XAF (Franc CFA Centrafricain)">
               {XAF_COUNTRIES.map(country => (
+                <option key={country} value={country}>{country}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Autres pays africains">
+              {OTHER_AFRICAN_COUNTRIES.map(country => (
                 <option key={country} value={country}>{country}</option>
               ))}
             </optgroup>

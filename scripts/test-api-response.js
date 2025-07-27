@@ -1,4 +1,5 @@
-const fetch = require('node-fetch');
+const https = require('https');
+const http = require('http');
 
 async function testApiResponse() {
   console.log('🧪 Test de la réponse API...\n');
@@ -8,14 +9,22 @@ async function testApiResponse() {
   
   try {
     console.log(`📡 Appel API: ${apiUrl}`);
-    
-    const response = await fetch(apiUrl);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
+
+    const data = await new Promise((resolve, reject) => {
+      const req = http.get(apiUrl, (res) => {
+        let body = '';
+        res.on('data', (chunk) => body += chunk);
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(body));
+          } catch (e) {
+            reject(new Error('Invalid JSON response'));
+          }
+        });
+      });
+      req.on('error', reject);
+      req.setTimeout(10000, () => reject(new Error('Request timeout')));
+    });
     
     console.log('✅ Réponse API reçue');
     console.log('\n📋 Informations de base:');

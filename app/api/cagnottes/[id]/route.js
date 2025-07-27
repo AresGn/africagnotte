@@ -96,7 +96,14 @@ export async function PUT(request, { params }) {
       show_target,
       target_amount,
       hide_amount,
-      show_participants
+      show_participants,
+      // Numéros de dépôt pour les différents opérateurs
+      numero_moov,
+      numero_mtn,
+      numero_orange,
+      numero_wave,
+      numero_airtel,
+      numero_autres
     } = body;
 
     // Validation des données
@@ -123,12 +130,14 @@ export async function PUT(request, { params }) {
 
     // Mettre à jour la cagnotte
     const updateResult = await client.query(
-      `UPDATE cagnottes 
-       SET title = $1, custom_url = $2, category = $3, description = $4, 
-           images = $5, video = $6, is_private = $7, show_target = $8, 
-           target_amount = $9, hide_amount = $10, show_participants = $11, 
+      `UPDATE cagnottes
+       SET title = $1, custom_url = $2, category = $3, description = $4,
+           images = $5, video = $6, is_private = $7, show_target = $8,
+           target_amount = $9, hide_amount = $10, show_participants = $11,
+           numero_moov = $12, numero_mtn = $13, numero_orange = $14,
+           numero_wave = $15, numero_airtel = $16, numero_autres = $17,
            updated_at = NOW()
-       WHERE id = $12 AND user_id = $13 
+       WHERE id = $18 AND user_id = $19
        RETURNING *`,
       [
         title,
@@ -142,6 +151,12 @@ export async function PUT(request, { params }) {
         show_target ? target_amount : null,
         hide_amount || false,
         show_participants !== undefined ? show_participants : true,
+        numero_moov?.trim() || null,
+        numero_mtn?.trim() || null,
+        numero_orange?.trim() || null,
+        numero_wave?.trim() || null,
+        numero_airtel?.trim() || null,
+        numero_autres?.trim() || null,
         cagnotteId,
         userId
       ]

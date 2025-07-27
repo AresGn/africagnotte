@@ -20,7 +20,7 @@ export async function GET(request, { params }) {
 
     // Essayer de trouver par custom_url d'abord
     const resultByUrl = await client.query(
-      'SELECT id, user_id, title, custom_url, category, description, long_description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, current_amount, participants_count, status, author_name, author_phone, author_socials, created_at, updated_at FROM cagnottes WHERE custom_url = $1',
+      'SELECT id, user_id, title, custom_url, category, description, long_description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, current_amount, participants_count, status, author_name, author_phone, author_socials, numero_moov, numero_mtn, numero_orange, numero_wave, numero_airtel, numero_autres, created_at, updated_at FROM cagnottes WHERE custom_url = $1',
       [slugOrId]
     );
 
@@ -30,7 +30,7 @@ export async function GET(request, { params }) {
       // Si non trouvé par custom_url, vérifier si c'est un UUID valide avant d'essayer par ID
       if (isValidUUID(slugOrId)) {
         const resultById = await client.query(
-          'SELECT id, user_id, title, custom_url, category, description, long_description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, current_amount, participants_count, status, author_name, author_phone, author_socials, created_at, updated_at FROM cagnottes WHERE id = $1',
+          'SELECT id, user_id, title, custom_url, category, description, long_description, images, video, is_private, show_target, target_amount, hide_amount, show_participants, current_amount, participants_count, status, author_name, author_phone, author_socials, numero_moov, numero_mtn, numero_orange, numero_wave, numero_airtel, numero_autres, created_at, updated_at FROM cagnottes WHERE id = $1',
           [slugOrId]
         );
         if (resultById.rows.length > 0) {

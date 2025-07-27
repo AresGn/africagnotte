@@ -46,7 +46,7 @@ async function testProofAPI() {
     
     const proofData = {
       proof_image_url: 'https://res.cloudinary.com/test/image/upload/v123456789/test_proof.jpg',
-      payment_status: 'proof_uploaded'
+      payment_status: 'pending'
     };
     
     console.log(`📡 Appel API POST: ${apiUrl}`);
