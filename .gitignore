@@ -52,3 +52,9 @@ supabase-test.http
 !README.md
 
 *.http
+
+# IDE / local
+.idea/
+cookies.txt
+*.sql.bak
+supabase_backup.sql
